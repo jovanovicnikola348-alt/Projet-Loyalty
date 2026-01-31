@@ -80,6 +80,7 @@ async function fetchNextAppointment(email) {
         const tokenRes = await fetch(proxy + tokenUrl);
         const tokenData = await tokenRes.json();
         
+        
         // Sécurité si le proxy renvoie une erreur
         if (!tokenData.data || !tokenData.data.token) return null;
         const accessToken = tokenData.data.token.access_token;
@@ -99,10 +100,17 @@ async function fetchNextAppointment(email) {
         });
         const appData = await appRes.json();
         
+        
         return (appData.data && appData.data.appointments) ? appData.data.appointments[0] : null;
     } catch (e) { 
         console.warn("Setmore : Impossible de charger le RDV pour le moment.");
         return null; 
+        // ... (après le fetch de appUrl)
+        const appData = await appRes.json();
+        
+        console.log("Réponse Setmore pour " + email + " :", appData); // <--- AJOUTE ÇA
+        
+        return (appData.data && appData.data.appointments) ? appData.data.appointments[0] : null;
     }
 }
 
