@@ -79,7 +79,81 @@ button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.5
     box-shadow: 0 8px 15px rgba(0,0,0,0.5); /* Ombre plus marquée */
 }
 
-/* ... (le reste du style est conservé pour la clarté) ... */
+/* Barre de progression, QR Code, etc. (Conservé) */
+
+/* Navigation basse (CORRIGÉ POUR L'ALIGNEMENT) */
+.bottom-nav {
+    position: fixed; 
+    bottom: 0; 
+    width: 100%; 
+    max-width: 450px; 
+    height: 75px;
+    background: var(--card-bg); 
+    display: flex; 
+    justify-content: space-around; 
+    align-items: center; 
+    border-top: 1px solid var(--primary); 
+    z-index: 1000;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
+    padding: 0 5px; 
+}
+
+.nav-item { 
+    text-align: center; 
+    color: var(--gray-text); 
+    font-size: 10px; 
+    cursor: pointer; 
+    flex: 1; /* Chaque élément prend une part égale */
+    min-width: 0; /* Évite l'écrasement */
+    padding-top: 5px;
+    white-space: nowrap; /* Empêche le texte de passer à la ligne */
+}
+.nav-item.active { 
+    color: var(--primary); 
+    font-weight: bold; 
+}
+.nav-icon { 
+    font-size: 24px; 
+    display: block; 
+    margin-bottom: 2px; 
+}
+
+/* Admin Styles (pour l'admin.html) - Conservé */
+#admin-main { padding-bottom: 90px; }
+.user-card {
+    background: #252525;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border-left: 3px solid var(--primary);
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+.badge {
+    background: var(--primary);
+    color: var(--bg-dark);
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.modal {
+    background: rgba(0,0,0,0.85); 
+}
+.modal-content {
+    background: var(--bg-dark); padding: 30px; border-radius: 10px;
+    border: 2px solid var(--primary); 
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+.point-controls { gap: 15px; }
+.btn-min, .btn-plus {
+    width: 45px; height: 45px; font-size: 22px; border-radius: 50%;
+    background: var(--secondary); color: white;
+}
+.history-item { color: var(--gray-text); }
+
 
 /* HISTORIQUE CLIENT */
 #visit-history-client {
