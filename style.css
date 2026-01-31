@@ -99,3 +99,43 @@ iframe { width: 100%; height: 100%; border: none; }
 .profile-box { background: #222; padding: 15px; border-radius: 10px; margin: 15px 0; text-align: center; }
 
 .logout-btn { background: #444; margin-top: 30px; }
+/* --- STYLES POUR L'ADMIN --- */
+.user-card {
+    background: #222;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border-left: 4px solid var(--gold);
+    cursor: pointer;
+}
+
+.badge {
+    background: var(--gold);
+    color: black;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background: var(--card-bg); padding: 30px; border-radius: 15px;
+    width: 90%; max-width: 400px; text-align: center; border: 1px solid var(--gold);
+}
+
+.point-controls {
+    display: flex; justify-content: center; align-items: center; gap: 20px; margin: 20px 0;
+}
+
+.btn-min, .btn-plus {
+    width: 50px; height: 50px; font-size: 24px; border-radius: 50%;
+}
+
+.history-item {
+    font-size: 12px; color: var(--gray); margin-bottom: 5px; text-align: left;
+}

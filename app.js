@@ -26,12 +26,24 @@ const langData = {
 
 function updateLanguage(lang) {
     const t = langData[lang];
-    document.getElementById('txt-title').innerText = t.title;
-    document.getElementById('txt-google').innerText = t.google;
-    document.getElementById('txt-loyalty').innerText = t.loyalty;
-    document.getElementById('txt-logout').innerText = t.logout;
-    document.getElementById('txt-show-qr').innerText = t.qr;
-    document.getElementById('txt-next-apt').innerText = t.next + " / Prochain RDV";
+    if (!t) return; // Sécurité si la langue n'existe pas
+
+    // On crée une petite fonction interne pour éviter de répéter "if (el)"
+    const safeSetText = (id, text) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = text;
+    };
+
+    safeSetText('txt-title', t.title);
+    safeSetText('txt-google', t.google);
+    safeSetText('txt-loyalty', t.loyalty);
+    safeSetText('txt-logout', t.logout); // Cherchera txt-logout
+    safeSetText('btn-logout', t.logout); // Cherchera aussi btn-logout au cas où
+    safeSetText('txt-show-qr', t.qr);
+    
+    const nextApt = document.getElementById('txt-next-apt');
+    if (nextApt) nextApt.innerText = t.next + " / Prochain RDV";
+
     localStorage.setItem('userLang', lang);
 }
 
