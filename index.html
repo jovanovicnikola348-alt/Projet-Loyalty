@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friz kod Francuza - Loyalty</title>
+    <!-- Styles et Polices -->
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="app">
+        <header>
+            <h1>Friz kod Francuza</h1>
+        </header>
+
+        <!-- ==========================================
+             SECTION CONNEXION / LOGIN
+        =========================================== -->
+        <section id="login-section">
+            <div style="text-align: right; margin-bottom: 15px;">
+                <select id="lang-select" class="lang-dropdown">
+                    <option value="fr">🇫🇷 FR</option>
+                    <option value="sr">🇷🇸 SR</option>
+                    <option value="en">🇬🇧 EN</option>
+                </select>
+            </div>
+
+            <h2 id="txt-title">Connexion</h2>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Mot de passe">
+            
+            <div class="auth-buttons">
+                <button id="btn-login">OK</button>
+                <button id="btn-signup" style="background-color: #222; border: 1px solid var(--gold);">Inscription</button>
+            </div>
+
+            <div class="separator">— OR —</div>
+
+            <button id="btn-google" class="google-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+                <span id="txt-google">Continuer avec Google</span>
+            </button>
+        </section>
+
+        <!-- ==========================================
+             SECTION CLIENT (Une fois connecté)
+        =========================================== -->
+        <section id="client-section" style="display: none; padding: 0;">
+            
+            <!-- ONGLET 1 : ACCUEIL (Points & RDV) -->
+            <div id="tab-home" class="tab-content">
+                <!-- Carte du prochain RDV (Setmore) -->
+                <div id="appointment-card" style="display: none;">
+                    <div class="apt-decor">✂️</div>
+                    <p id="txt-next-apt" class="label-gold">Prochain RDV / Sledeći termin</p>
+                    <div class="apt-details">
+                        <span class="calendar-icon">📅</span>
+                        <div>
+                            <h3 id="next-appointment-date">...</h3>
+                            <p id="next-appointment-time"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carte de Fidélité -->
+                <div class="status-card">
+                    <h3 id="txt-loyalty">Ma Fidélité</h3>
+                    <div id="points-display">0 / 5</div>
+                    <div class="progress-container">
+                        <div id="progress-bar"></div>
+                    </div>
+                    <p id="gift-msg" style="display: none;"></p>
+                </div>
+
+                <!-- QR Code -->
+                <div class="qr-section">
+                    <p id="txt-show-qr">Présentez ce code au salon :</p>
+                    <div class="qr-container">
+                        <div id="qrcode"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ONGLET 2 : RÉSERVATION (Setmore Iframe) -->
+            <div id="tab-booking" class="tab-content" style="display: none;">
+                <iframe src="https://frizkodfrancuza.setmore.com" frameborder="0" allow="web-share; payment"></iframe>
+            </div>
+
+            <!-- ONGLET 3 : PROFIL -->
+            <div id="tab-profile" class="tab-content" style="display: none; padding: 20px;">
+                <h2 id="txt-profile-title" style="color: var(--gold);">Mon Profil</h2>
+                <div class="profile-box">
+                    <p id="user-email-display"></p>
+                </div>
+
+                <div class="lang-settings">
+                    <label id="txt-lang-label">Changer la langue :</label>
+                    <select id="lang-select-profile" class="lang-dropdown" style="width: 100%; margin-top: 10px;">
+                        <option value="fr">🇫🇷 Français</option>
+                        <option value="sr">🇷🇸 Srpski</option>
+                        <option value="en">🇬🇧 English</option>
+                    </select>
+                </div>
+
+                <button id="btn-logout" class="logout-btn">Déconnexion</button>
+            </div>
+
+            <!-- BARRE DE NAVIGATION BASSE -->
+            <nav class="bottom-nav">
+                <div class="nav-item active" onclick="showTab('home', this)">
+                    <span class="nav-icon">🏠</span>
+                    <p>Accueil</p>
+                </div>
+                <div class="nav-item" onclick="showTab('booking', this)">
+                    <span class="nav-icon">📅</span>
+                    <p>Rendez-vous</p>
+                </div>
+                <div class="nav-item" onclick="showTab('profile', this)">
+                    <span class="nav-icon">👤</span>
+                    <p>Profil</p>
+                </div>
+            </nav>
+        </section>
+    </div>
+
+    <!-- Bibliothèques -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script type="module" src="app.js"></script>
+
+    <!-- Script de navigation rapide -->
+    <script>
+        function showTab(tabName, element) {
+            // Cacher tous les onglets
+            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+            // Afficher l'onglet cliqué
+            document.getElementById('tab-' + tabName).style.display = 'block';
+            
+            // Gérer l'état actif du menu
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+        }
+    </script>
+</body>
+</html>

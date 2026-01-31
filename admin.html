@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Friz kod Francuza</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Friz kod Francuza</h1>
+            <p id="admin-subtitle">Gestion Salon</p>
+        </header>
+
+        <!-- Vue Liste & Recherche -->
+        <section id="admin-main">
+            <button id="open-scanner" style="margin-bottom: 20px;">📷 Ouvrir le Scanner</button>
+            
+            <div class="search-bar">
+                <input type="text" id="user-search" placeholder="Rechercher un client (email)...">
+            </div>
+
+            <div id="user-list">
+                <p>Chargement des clients...</p>
+            </div>
+        </section>
+
+        <!-- Vue Scanner (Cachée par défaut) -->
+        <section id="scanner-view" style="display:none;">
+            <div id="reader"></div>
+            <button id="close-scanner" style="background: #666;">Retour à la liste</button>
+        </section>
+
+        <!-- Fenêtre Détails Client (Modal) -->
+        <div id="user-modal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h2 id="modal-email" style="color:var(--gold)"></h2>
+                <div class="point-controls">
+                    <button class="btn-min" id="remove-point">-</button>
+                    <span id="modal-points">0</span>
+                    <button class="btn-plus" id="add-point">+</button>
+                </div>
+                <hr>
+                <h3>Historique des visites</h3>
+                <div id="visit-history"></div>
+                <button id="close-modal" style="margin-top:20px;">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
