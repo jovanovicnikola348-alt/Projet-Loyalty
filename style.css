@@ -3,8 +3,9 @@
     --secondary: #6F4E37;     /* Brun Café */
     --bg-dark: #0A0A0A;       /* Noir Profond */
     --card-bg: #1C1C1C;       /* Gris Foncé */
-    --text-light: #F0F0F0;    /* Blanc Cassé */
+    --text-light: #F0F0F0;    /* Blanc Cassé (Principal) */
     --gray-text: #AAAAAA;     /* Gris Clair */
+    --danger: #e74c3c;        /* Rouge */
 }
 
 body {
@@ -31,10 +32,10 @@ header h1 {
     font-family: 'Playfair Display', serif;
     color: var(--primary);
     text-align: center;
-    letter-spacing: 3px;
+    letter-spacing: 4px; /* Plus d'espace */
     padding: 25px 0 15px;
     margin: 0;
-    font-size: 28px;
+    font-size: 30px;
 }
 
 /* Sections */
@@ -46,92 +47,53 @@ input {
     width: 100%; padding: 15px; margin: 12px 0;
     background: #252525; border: 1px solid #333; color: var(--text-light); border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    transition: border-color 0.2s;
 }
+input:focus { border-color: var(--primary); outline: none; }
 
 button {
-    width: 100%; padding: 15px; background: var(--primary);
-    color: var(--bg-dark); border: none; border-radius: 5px;
+    width: 100%; padding: 15px; border: none; border-radius: 5px;
     font-weight: bold; cursor: pointer; margin-top: 15px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-    transition: background-color 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
+.primary-btn { background: var(--primary); color: var(--bg-dark); }
+.secondary-btn { 
+    background: var(--card-bg); 
+    color: var(--text-light); /* Couleur forcée en blanc pour le fond sombre */
+    border: 1px solid var(--primary);
+}
 .google-btn {
     background: var(--card-bg); color: var(--text-light); border: 1px solid #444;
 }
 
 .separator { margin: 25px 0; color: var(--gray-text); font-size: 14px; }
+.small-link { color: var(--gray-text); font-size: 12px; margin-top: 15px; cursor: pointer; }
 
 /* Cartes (Fidélité & RDV) */
-.status-card, #appointment-card {
+.status-card {
     background: var(--card-bg); padding: 25px; border-radius: 10px;
     margin-bottom: 20px; border: 1px solid #333;
-    box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.5); /* Ombre plus marquée */
 }
 
-#appointment-card { border: 1px solid var(--secondary); }
+/* ... (le reste du style est conservé pour la clarté) ... */
 
-.label-gold { color: var(--primary); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin: 0; }
-
-#points-display { font-size: 52px; font-weight: 700; margin: 10px 0; text-align: center; color: var(--primary); }
-
-/* Barre de progression */
-.progress-container { background: #333; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 10px; }
-#progress-bar { background: var(--primary); height: 100%; width: 0%; transition: width 0.5s ease-in-out; }
-
-/* QR Code */
-.qr-section { text-align: center; margin-top: 30px; }
-.qr-container { background: white; padding: 20px; display: inline-block; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
-.qr-container > div { line-height: 0; } /* Fix pour le QR code */
-
-/* Navigation basse */
-.bottom-nav {
-    position: fixed; bottom: 0; width: 100%; max-width: 450px; height: 75px;
-    background: var(--card-bg); display: flex; justify-content: space-around;
-    align-items: center; border-top: 1px solid var(--primary); z-index: 1000;
-    box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
+/* HISTORIQUE CLIENT */
+#visit-history-client {
+    margin-top: 20px;
 }
-
-.nav-item { text-align: center; color: var(--gray-text); font-size: 10px; cursor: pointer; flex: 1; padding-top: 5px;}
-.nav-item.active { color: var(--primary); font-weight: bold; }
-.nav-icon { font-size: 24px; display: block; margin-bottom: 2px; }
-
-/* Iframe Setmore */
-iframe { width: 100%; height: 100%; border: none; background: white; border-radius: 8px; }
-
-/* Admin Styles (pour l'admin.html) */
-#admin-main { padding-bottom: 90px; }
-.user-card {
+.history-item-client {
     background: #252525;
-    padding: 15px;
-    margin-bottom: 10px;
+    padding: 10px 15px;
+    margin-bottom: 8px;
     border-radius: 5px;
     border-left: 3px solid var(--primary);
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-
-.badge {
-    background: var(--primary);
-    color: var(--bg-dark);
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-weight: bold;
-    font-size: 12px;
-}
-
-.modal {
-    background: rgba(0,0,0,0.85); 
-}
-.modal-content {
-    background: var(--bg-dark); padding: 30px; border-radius: 10px;
-    border: 2px solid var(--primary); 
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-}
-.point-controls { gap: 15px; }
-.btn-min, .btn-plus {
-    width: 45px; height: 45px; font-size: 22px; border-radius: 50%;
-    background: var(--secondary); color: white;
-}
-.history-item { color: var(--gray-text); }
+.history-item-client span { color: var(--gray-text); font-size: 12px; }

@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -10,32 +10,40 @@ const firebaseConfig = {
     messagingSenderId: "645134286018",
     appId: "1:645134286018:web:5bf96b80d24393a2bd8f5b"
 };
-// La variable est gardée, mais n'est plus utilisée.
-const SETMORE_REFRESH_TOKEN = "r1/2557ad16dcZ1aOBR0sCas6W2Z7MtRXgk25KLBL9cDIMW7";
+const SETMORE_REFRESH_TOKEN = "r1/2557ad16dcZ1aOBR0sCas6W2Z7MtRXgk25KLBL9cDIMW7"; // Inutilisé, mais gardé
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// --- 1. LANGUES COMPLÈTES (Fonctionne parfaitement) ---
+// --- 1. LANGUES COMPLÈTES ---
 const langData = {
     fr: { 
         title: "Connexion", google: "Continuer avec Google", loyalty: "Ma Fidélité", 
         gift: "🎁 Coupe offerte !", logout: "Déconnexion", qr: "Présentez ce code au salon :", 
         next: "Prochain RDV", navHome: "Accueil", navBooking: "Rendez-vous", navProfile: "Profil",
-        profileTitle: "Mon Profil", langLabel: "Changer la langue :"
+        navHistory: "Visites", profileTitle: "Mon Profil", langLabel: "Changer la langue :",
+        phEmail: "Email", phPassword: "Mot de passe", phUsername: "Nom/Pseudo",
+        login: "Se connecter", signup: "Inscription", signupToggle: "Vous n'avez pas de compte ? S'inscrire",
+        historyTitle: "Historique des visites", noHistory: "Aucune visite enregistrée."
     },
     sr: { 
         title: "Prijava", google: "Nastavi sa Google-om", loyalty: "Moja lojalnost", 
         gift: "🎁 Besplatno šišanje !", logout: "Odjavi se", qr: "Pokažite ovaj kod u salonu :", 
         next: "Sledeći termin", navHome: "Početna", navBooking: "Termini", navProfile: "Profil",
-        profileTitle: "Moj Profil", langLabel: "Promeni jezik :"
+        navHistory: "Posete", profileTitle: "Moj Profil", langLabel: "Promeni jezik :",
+        phEmail: "Email", phPassword: "Lozinka", phUsername: "Ime/Nadimak",
+        login: "Prijavi se", signup: "Registracija", signupToggle: "Nemate nalog? Registracija",
+        historyTitle: "Istorija poseta", noHistory: "Nema zabeleženih poseta."
     },
     en: { 
         title: "Login", google: "Continue with Google", loyalty: "My Loyalty", 
         gift: "🎁 Free Haircut !", logout: "Logout", qr: "Show this code at the salon:", 
         next: "Next Appointment", navHome: "Home", navBooking: "Booking", navProfile: "Profile",
-        profileTitle: "My Profile", langLabel: "Change Language :"
+        navHistory: "History", profileTitle: "My Profile", langLabel: "Change Language :",
+        phEmail: "Email", phPassword: "Password", phUsername: "Name/Nickname",
+        login: "Login", signup: "Signup", signupToggle: "Don't have an account? Sign up",
+        historyTitle: "Visit History", noHistory: "No recorded visits."
     }
 };
 
@@ -43,11 +51,10 @@ function updateLanguage(lang) {
     const t = langData[lang];
     if (!t) return;
 
-    const safeSetText = (id, text) => {
-        const el = document.getElementById(id);
-        if (el) el.innerText = text;
-    };
+    const safeSetText = (id, text) => { const el = document.getElementById(id); if (el) el.innerText = text; };
+    const safeSetPlaceholder = (id, text) => { const el = document.getElementById(id); if (el) el.placeholder = text; };
 
+    // Traduction des textes
     safeSetText('txt-title', t.title);
     safeSetText('txt-google', t.google);
     safeSetText('txt-loyalty', t.loyalty);
@@ -59,15 +66,24 @@ function updateLanguage(lang) {
     safeSetText('nav-home', t.navHome);
     safeSetText('nav-booking', t.navBooking);
     safeSetText('nav-profile', t.navProfile);
+    safeSetText('nav-history', t.navHistory);
+    safeSetText('history-title', t.historyTitle);
+    safeSetText('btn-login', t.login);
+    safeSetText('btn-signup', t.signup);
+    safeSetText('toggle-signup', t.signupToggle);
 
+    // Traduction des placeholders (CORRIGÉ !)
+    safeSetPlaceholder('email', t.phEmail);
+    safeSetPlaceholder('password', t.phPassword);
+    safeSetPlaceholder('username', t.phUsername);
+    
     const nextApt = document.getElementById('txt-next-apt');
     if (nextApt) nextApt.innerText = t.next;
 
     localStorage.setItem('userLang', lang);
 }
 
-// --- 2. LOGIQUE SETMORE (Fonction désactivée pour éviter les erreurs) ---
-// La fonction reste, mais est vide pour ne pas faire planter le code.
+// --- 2. LOGIQUE SETMORE (Désactivé) ---
 async function updateAppointmentUI(email) {
     const cardHome = document.getElementById('appointment-card');
     const cardProfile = document.getElementById('appointment-card-profile');
@@ -75,7 +91,7 @@ async function updateAppointmentUI(email) {
     if (cardProfile) cardProfile.style.display = 'none';
 }
 
-// --- 3. INITIALISATION ---
+// --- 3. INITIALISATION & LOGIQUE INSCRIPTION ---
 document.addEventListener('DOMContentLoaded', () => {
     const savedLang = localStorage.getItem('userLang') || 'fr';
     updateLanguage(savedLang);
@@ -85,36 +101,72 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if(lSelect) lSelect.onchange = (e) => { updateLanguage(e.target.value); if(pLSelect) pLSelect.value = e.target.value; };
     if(pLSelect) pLSelect.onchange = (e) => { updateLanguage(e.target.value); if(lSelect) lSelect.value = e.target.value; };
+
+    // Logique pour basculer entre Login et Inscription
+    const usernameInput = document.getElementById('username');
+    const toggleLink = document.getElementById('toggle-signup');
+    let isSigningUp = false;
+
+    if(toggleLink) toggleLink.onclick = () => {
+        isSigningUp = !isSigningUp;
+        if(isSigningUp) {
+            usernameInput.style.display = 'block';
+            toggleLink.innerText = langData[localStorage.getItem('userLang') || 'fr'].login;
+            document.getElementById('btn-login').style.display = 'none';
+            document.getElementById('btn-signup').style.display = 'block';
+        } else {
+            usernameInput.style.display = 'none';
+            toggleLink.innerText = langData[localStorage.getItem('userLang') || 'fr'].signupToggle;
+            document.getElementById('btn-login').style.display = 'block';
+            document.getElementById('btn-signup').style.display = 'none';
+        }
+    };
+    
+    // Au démarrage, on affiche le Login par défaut
+    if(usernameInput) usernameInput.style.display = 'none';
+    if(document.getElementById('btn-signup')) document.getElementById('btn-signup').style.display = 'none';
 });
 
-// --- 4. AUTH & TEMPS RÉEL (Logique simplifiée pour la stabilité) ---
+// --- 4. AUTH & TEMPS RÉEL ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         document.getElementById('login-section').style.display = 'none';
         document.getElementById('client-section').style.display = 'block';
-        document.getElementById('user-email-display').innerText = user.email;
+        
+        // Affichage du nom si disponible
+        const displayName = user.displayName || user.email.split('@')[0];
+        document.getElementById('user-email-display').innerText = displayName;
 
-        // On appelle la fonction pour masquer le RDV
+        // Masquer le RDV
         updateAppointmentUI(user.email);
         
-        // Points & QR Code
+        // Points, QR Code & HISTORIQUE
         onSnapshot(doc(db, "users", user.uid), (snap) => {
-             if (snap.exists()) {
+            if (snap.exists()) {
                 const data = snap.data();
-                document.getElementById('points-display').innerText = `${data.points} / 5`;
-                const progress = document.getElementById('progress-bar');
-                if(progress) progress.style.width = (data.points / 5 * 100) + "%";
+                const currentLang = localStorage.getItem('userLang') || 'fr';
                 
-                const gift = document.getElementById('gift-msg');
-                if (data.points >= 5) {
-                    gift.innerText = langData[localStorage.getItem('userLang') || 'fr'].gift;
-                    gift.style.display = 'block';
-                } else { gift.style.display = 'none'; }
+                // Points
+                document.getElementById('points-display').innerText = `${data.points} / 5`;
+                document.getElementById('progress-bar').style.width = (data.points / 5 * 100) + "%";
+                document.getElementById('gift-msg').style.display = data.points >= 5 ? 'block' : 'none';
+                document.getElementById('gift-msg').innerText = langData[currentLang].gift;
 
-                const qrContainer = document.getElementById('qrcode');
-                if(qrContainer) {
-                    qrContainer.innerHTML = "";
-                    new QRCode(qrContainer, { text: user.uid, width: 140, height: 140 });
+                // QR Code
+                document.getElementById('qrcode').innerHTML = "";
+                new QRCode(document.getElementById('qrcode'), { text: user.uid, width: 140, height: 140 });
+
+                // HISTORIQUE CLIENT
+                const histDiv = document.getElementById('visit-history-client');
+                const history = data.history || [];
+                if (histDiv) {
+                    if (history.length === 0) {
+                        histDiv.innerHTML = `<p style="text-align:center; color: var(--gray-text);">${langData[currentLang].noHistory}</p>`;
+                    } else {
+                        histDiv.innerHTML = history.reverse().map(date => 
+                            `<div class="history-item-client"><span>Visite du</span>${date}</div>`
+                        ).join('');
+                    }
                 }
             }
         });
@@ -124,22 +176,41 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// Boutons Auth
+// --- 5. Boutons Auth (Mis à jour pour le pseudo) ---
 document.getElementById('btn-google').onclick = () => {
     signInWithPopup(auth, new GoogleAuthProvider()).then(res => {
         setDoc(doc(db, "users", res.user.uid), { email: res.user.email, points: 0, history: [] }, { merge: true });
     });
 };
+
 document.getElementById('btn-login').onclick = () => {
     const e = document.getElementById('email').value;
     const p = document.getElementById('password').value;
     signInWithEmailAndPassword(auth, e, p);
 };
+
 document.getElementById('btn-signup').onclick = () => {
     const e = document.getElementById('email').value;
     const p = document.getElementById('password').value;
-    createUserWithEmailAndPassword(auth, e, p).then(res => {
-        setDoc(doc(db, "users", res.user.uid), { email: e, points: 0, history: [] });
-    });
+    const username = document.getElementById('username').value;
+    
+    createUserWithEmailAndPassword(auth, e, p)
+        .then(res => {
+            // AJOUT DU PSEUDO DANS LE PROFIL FIREBASE
+            return updateProfile(res.user, { displayName: username });
+        })
+        .then(res => {
+            // CRÉATION DU DOCUMENT FIREBASE
+            setDoc(doc(db, "users", auth.currentUser.uid), { 
+                email: auth.currentUser.email, 
+                displayName: username,
+                points: 0, 
+                history: [] 
+            });
+        })
+        .catch(error => {
+            alert("Erreur Inscription: " + error.message);
+        });
 };
+
 document.getElementById('btn-logout').onclick = () => signOut(auth);

@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <link rel="icon" href="data:,">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friz kod Francuza - Loyalty</title>
-    <!-- Styles et Polices -->
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:,"> <!-- Fix Favicon -->
 </head>
 <body>
 
@@ -29,12 +28,15 @@
             </div>
 
             <h2 id="txt-title">Connexion</h2>
+            
+            <!-- Champ d'inscription / login -->
             <input type="email" id="email" placeholder="Email">
+            <input type="text" id="username" placeholder="Nom/Pseudo" style="display:none;"> <!-- Nouveau champ Pseudo -->
             <input type="password" id="password" placeholder="Mot de passe">
             
             <div class="auth-buttons">
-                <button id="btn-login">OK</button>
-                <button id="btn-signup" style="background-color: #222; border: 1px solid var(--gold);">Inscription</button>
+                <button id="btn-login" class="primary-btn">Se connecter</button>
+                <button id="btn-signup" class="secondary-btn">Inscription</button>
             </div>
 
             <div class="separator">— OR —</div>
@@ -43,6 +45,8 @@
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
                 <span id="txt-google">Continuer avec Google</span>
             </button>
+            
+            <p id="toggle-signup" class="small-link">Vous n'avez pas de compte ? S'inscrire</p>
         </section>
 
         <!-- ==========================================
@@ -50,19 +54,13 @@
         =========================================== -->
         <section id="client-section" style="display: none; padding: 0;">
             
-            <!-- ONGLET 1 : ACCUEIL (Points & RDV) -->
+            <!-- ONGLET 1 : ACCUEIL (Points) -->
             <div id="tab-home" class="tab-content">
-                <!-- Carte du prochain RDV (Setmore) -->
+                <!-- Carte du prochain RDV (Masquée, mais au cas où) -->
                 <div id="appointment-card" style="display: none;">
-                    <div class="apt-decor">✂️</div>
-                    <p id="txt-next-apt" class="label-gold">Prochain RDV / Sledeći termin</p>
-                    <div class="apt-details">
-                        <span class="calendar-icon">📅</span>
-                        <div>
-                            <h3 id="next-appointment-date">...</h3>
-                            <p id="next-appointment-time"></p>
-                        </div>
-                    </div>
+                    <p id="txt-next-apt" class="label-gold">Prochain RDV</p>
+                    <h3 id="next-appointment-date">...</h3>
+                    <p id="next-appointment-time"></p>
                 </div>
 
                 <!-- Carte de Fidélité -->
@@ -84,71 +82,72 @@
                 </div>
             </div>
 
-            <!-- ONGLET 2 : RÉSERVATION (Setmore Iframe) -->
+            <!-- NOUVEL ONGLET 2 : HISTORIQUE -->
+            <div id="tab-history" class="tab-content" style="display: none;">
+                <h2 id="history-title">Mon Historique</h2>
+                <div id="visit-history-client">
+                    <!-- Les visites s'afficheront ici -->
+                </div>
+            </div>
+
+            <!-- ONGLET 3 : RÉSERVATION (Setmore Iframe) -->
             <div id="tab-booking" class="tab-content" style="display: none;">
                 <iframe src="https://frizkodfrancuza.setmore.com" frameborder="0" allow="web-share; payment"></iframe>
             </div>
 
-            <!-- ONGLET 3 : PROFIL -->
-<div id="tab-profile" class="tab-content" style="display: none; padding: 20px;">
-    <h2 id="txt-profile-title" style="color: var(--gold);">Mon Profil</h2>
-    
-    <!-- Nouveau : On affiche aussi le RDV ici s'il existe -->
-    <div id="appointment-card-profile" class="status-card" style="display: none; border: 1px solid var(--gold); background: #1a1a1a;">
-        <p class="label-gold">📅 Prochain RDV</p>
-        <h3 id="next-appointment-date-profile">...</h3>
-        <p id="next-appointment-time-profile"></p>
-    </div>
+            <!-- ONGLET 4 : PROFIL -->
+            <div id="tab-profile" class="tab-content" style="display: none; padding: 20px;">
+                <h2 id="txt-profile-title" style="color: var(--gold);">Mon Profil</h2>
+                <div class="profile-box">
+                    <p id="user-email-display"></p>
+                </div>
 
-    <div class="profile-box">
-        <p id="user-email-display"></p>
-    </div>
+                <div class="lang-settings">
+                    <label id="txt-lang-label">Changer la langue :</label>
+                    <select id="lang-select-profile" class="lang-dropdown" style="width: 100%; margin-top: 10px;">
+                        <option value="fr">🇫🇷 Français</option>
+                        <option value="sr">🇷🇸 Srpski</option>
+                        <option value="en">🇬🇧 English</option>
+                    </select>
+                </div>
 
-    <div class="lang-settings">
-        <label id="txt-lang-label">Changer la langue :</label>
-        <select id="lang-select-profile" class="lang-dropdown" style="width: 100%; margin-top: 10px;">
-            <option value="fr">🇫🇷 Français</option>
-            <option value="sr">🇷🇸 Srpski</option>
-            <option value="en">🇬🇧 English</option>
-        </select>
-    </div>
-
-    <button id="btn-logout" class="logout-btn">Déconnexion</button>
-</div>
+                <button id="btn-logout" class="logout-btn">Déconnexion</button>
+            </div>
 
             <!-- BARRE DE NAVIGATION BASSE -->
-<nav class="bottom-nav">
-    <div class="nav-item active" onclick="showTab('home', this)">
-        <span class="nav-icon">🏠</span>
-        <p id="nav-home">Accueil</p>
+            <nav class="bottom-nav">
+                <div class="nav-item active" onclick="showTab('home', this)">
+                    <span class="nav-icon">🏠</span>
+                    <p id="nav-home">Accueil</p>
+                </div>
+                <div class="nav-item" onclick="showTab('history', this)"> <!-- Nouveau bouton Historique -->
+                    <span class="nav-icon">📜</span>
+                    <p id="nav-history">Historique</p>
+                </div>
+                <div class="nav-item" onclick="showTab('booking', this)">
+                    <span class="nav-icon">📅</span>
+                    <p id="nav-booking">Rendez-vous</p>
+                </div>
+                <div class="nav-item" onclick="showTab('profile', this)">
+                    <span class="nav-icon">👤</span>
+                    <p id="nav-profile">Profil</p>
+                </div>
+            </nav>
+        </section>
     </div>
-    <div class="nav-item" onclick="showTab('booking', this)">
-        <span class="nav-icon">📅</span>
-        <p id="nav-booking">Rendez-vous</p>
-    </div>
-    <div class="nav-item" onclick="showTab('profile', this)">
-        <span class="nav-icon">👤</span>
-        <p id="nav-profile">Profil</p>
-    </div>
-</nav>
 
     <!-- Bibliothèques -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script type="module" src="app.js"></script>
 
-    <!-- Script de navigation rapide -->
+    <!-- Script de navigation rapide (mis à jour) -->
     <script>
         function showTab(tabName, element) {
-            // Cacher tous les onglets
             document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
-            // Afficher l'onglet cliqué
             document.getElementById('tab-' + tabName).style.display = 'block';
-            
-            // Gérer l'état actif du menu
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             element.classList.add('active');
-        } 
-        
+        }
     </script>
 </body>
 </html>
