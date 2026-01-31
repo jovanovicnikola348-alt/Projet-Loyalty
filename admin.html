@@ -6,6 +6,8 @@
     <title>Admin - Friz kod Francuza</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <!-- AJOUT : Évite l'erreur du Favicon -->
+    <link rel="icon" href="data:,">
 </head>
 <body>
     <div id="app">
@@ -42,10 +44,19 @@
                     <span id="modal-points">0</span>
                     <button class="btn-plus" id="add-point">+</button>
                 </div>
-                <hr>
+                
+                <!-- AJOUTS : Boutons de gestion -->
+                <button id="use-reward" style="background-color: #e67e22; margin-top: 10px;">🎁 Utiliser la récompense (Reset à 0)</button>
+
+                <hr style="margin-top: 20px; border-color: #333;">
+                
                 <h3>Historique des visites</h3>
                 <div id="visit-history"></div>
-                <button id="close-modal" style="margin-top:20px;">Fermer</button>
+
+                <!-- AJOUT : Bouton de suppression -->
+                <button id="delete-user-btn" style="background-color: #c0392b; margin-top: 30px;">Supprimer l'utilisateur</button>
+
+                <button id="close-modal" style="margin-top:20px; background-color: #444;">Fermer</button>
             </div>
         </div>
     </div>
