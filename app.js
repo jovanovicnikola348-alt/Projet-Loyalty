@@ -25,7 +25,7 @@ const langData = {
         profileTitle: "Mon Profil", langLabel: "Changer la langue :"
     },
     sr: { 
-        title: "Prijava", google: "Nastavi sa Google-om", loyalty: "Moja Fidélité", 
+        title: "Prijava", google: "Nastavi sa Google-om", loyalty: "Moja lojalnost", 
         gift: "🎁 Besplatno šišanje !", logout: "Odjavi se", qr: "Pokažite ovaj kod u salonu :", 
         next: "Sledeći termin", navHome: "Početna", navBooking: "Termini", navProfile: "Profil",
         profileTitle: "Moj Profil", langLabel: "Promeni jezik :"
@@ -70,26 +70,40 @@ function updateLanguage(lang) {
 
 // --- 2. LOGIQUE SETMORE ---
 async function fetchNextAppointment(email) {
+    if (!email) return null;
     try {
-        const proxy = "https://api.allorigins.win/raw?url=";
-        const tokenUrl = encodeURIComponent(`https://api.setmore.com/api/v1/o/oauth2/token?grant_type=refresh_token&refresh_token=${SETMORE_REFRESH_TOKEN}`);
+        // Nouveau proxy : CodeTabs (très simple, pas besoin d'encodage complexe)
+        const proxy = "https://api.codetabs.com/v1/proxy?quest=";
+        
+        // A. Récupérer le Token
+        const tokenUrl = "https://api.setmore.com/api/v1/o/oauth2/token?grant_type=refresh_token&refresh_token=" + SETMORE_REFRESH_TOKEN;
         const tokenRes = await fetch(proxy + tokenUrl);
         const tokenData = await tokenRes.json();
+        
+        // Sécurité si le proxy renvoie une erreur
+        if (!tokenData.data || !tokenData.data.token) return null;
         const accessToken = tokenData.data.token.access_token;
 
-        const custUrl = encodeURIComponent(`https://api.setmore.com/api/v1/bookingapi/customer?email=${email}`);
-        const custRes = await fetch(proxy + custUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+        // B. Trouver le Client
+        const custUrl = "https://api.setmore.com/api/v1/bookingapi/customer?email=" + email;
+        const custRes = await fetch(proxy + custUrl, {
+            headers: { 'Authorization': 'Bearer ' + accessToken }
+        });
         const custData = await custRes.json();
-        
-        if (!custData.data.customer) return null;
+        if (!custData.data || !custData.data.customer) return null;
 
-        const appUrl = encodeURIComponent(`https://api.setmore.com/api/v1/bookingapi/appointments/${custData.data.customer.key}`);
-        const appRes = await fetch(proxy + appUrl, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+        // C. Récupérer le RDV
+        const appUrl = "https://api.setmore.com/api/v1/bookingapi/appointments/" + custData.data.customer.key;
+        const appRes = await fetch(proxy + appUrl, {
+            headers: { 'Authorization': 'Bearer ' + accessToken }
+        });
         const appData = await appRes.json();
         
-        // Retourne le premier rendez-vous futur trouvé
-        return appData.data.appointments[0] || null;
-    } catch (e) { return null; }
+        return (appData.data && appData.data.appointments) ? appData.data.appointments[0] : null;
+    } catch (e) { 
+        console.warn("Setmore : Impossible de charger le RDV pour le moment.");
+        return null; 
+    }
 }
 
 // --- 3. INITIALISATION ---
@@ -135,35 +149,51 @@ async function updateAppointmentUI(email) {
     }
 }
 
+let isAppointmentLoaded = false; // Sécurité pour ne pas charger 50 fois
+
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         document.getElementById('login-section').style.display = 'none';
         document.getElementById('client-section').style.display = 'block';
         document.getElementById('user-email-display').innerText = user.email;
 
-        // Premier chargement
-        updateAppointmentUI(user.email);
+        // Charger le RDV seulement s'il n'est pas encore chargé
+        if (!isAppointmentLoaded) {
+            updateAppointmentUI(user.email);
+            isAppointmentLoaded = true;
+        }
 
-        // Écouter l'événement de rafraîchissement quand on change d'onglet
+        // Rafraîchir quand on clique sur les onglets (événement manuel)
         window.addEventListener('refreshAppointments', () => {
             updateAppointmentUI(user.email);
         });
 
-        // Points & QR Code
+        // Le reste (Points & QR Code) reste identique...
         onSnapshot(doc(db, "users", user.uid), (snap) => {
-            if (snap.exists()) {
+             // ... ton code actuel pour les points ...
+             if (snap.exists()) {
                 const data = snap.data();
                 document.getElementById('points-display').innerText = `${data.points} / 5`;
-                document.getElementById('progress-bar').style.width = (data.points / 5 * 100) + "%";
-                document.getElementById('gift-msg').style.display = data.points >= 5 ? 'block' : 'none';
-                document.getElementById('gift-msg').innerText = langData[localStorage.getItem('userLang') || 'fr'].gift;
-                document.getElementById('qrcode').innerHTML = "";
-                new QRCode(document.getElementById('qrcode'), { text: user.uid, width: 140, height: 140 });
+                const progress = document.getElementById('progress-bar');
+                if(progress) progress.style.width = (data.points / 5 * 100) + "%";
+                
+                const gift = document.getElementById('gift-msg');
+                if (data.points >= 5) {
+                    gift.innerText = langData[localStorage.getItem('userLang') || 'fr'].gift;
+                    gift.style.display = 'block';
+                } else { gift.style.display = 'none'; }
+
+                const qrContainer = document.getElementById('qrcode');
+                if(qrContainer) {
+                    qrContainer.innerHTML = "";
+                    new QRCode(qrContainer, { text: user.uid, width: 140, height: 140 });
+                }
             }
         });
     } else {
         document.getElementById('login-section').style.display = 'block';
         document.getElementById('client-section').style.display = 'none';
+        isAppointmentLoaded = false;
     }
 });
 
