@@ -89,41 +89,47 @@
             </div>
 
             <!-- ONGLET 3 : PROFIL -->
-            <div id="tab-profile" class="tab-content" style="display: none; padding: 20px;">
-                <h2 id="txt-profile-title" style="color: var(--gold);">Mon Profil</h2>
-                <div class="profile-box">
-                    <p id="user-email-display"></p>
-                </div>
+<div id="tab-profile" class="tab-content" style="display: none; padding: 20px;">
+    <h2 id="txt-profile-title" style="color: var(--gold);">Mon Profil</h2>
+    
+    <!-- Nouveau : On affiche aussi le RDV ici s'il existe -->
+    <div id="appointment-card-profile" class="status-card" style="display: none; border: 1px solid var(--gold); background: #1a1a1a;">
+        <p class="label-gold">📅 Prochain RDV</p>
+        <h3 id="next-appointment-date-profile">...</h3>
+        <p id="next-appointment-time-profile"></p>
+    </div>
 
-                <div class="lang-settings">
-                    <label id="txt-lang-label">Changer la langue :</label>
-                    <select id="lang-select-profile" class="lang-dropdown" style="width: 100%; margin-top: 10px;">
-                        <option value="fr">🇫🇷 Français</option>
-                        <option value="sr">🇷🇸 Srpski</option>
-                        <option value="en">🇬🇧 English</option>
-                    </select>
-                </div>
+    <div class="profile-box">
+        <p id="user-email-display"></p>
+    </div>
 
-                <button id="btn-logout" class="logout-btn">Déconnexion</button>
-            </div>
+    <div class="lang-settings">
+        <label id="txt-lang-label">Changer la langue :</label>
+        <select id="lang-select-profile" class="lang-dropdown" style="width: 100%; margin-top: 10px;">
+            <option value="fr">🇫🇷 Français</option>
+            <option value="sr">🇷🇸 Srpski</option>
+            <option value="en">🇬🇧 English</option>
+        </select>
+    </div>
+
+    <button id="btn-logout" class="logout-btn">Déconnexion</button>
+</div>
 
             <!-- BARRE DE NAVIGATION BASSE -->
-            <nav class="bottom-nav">
-                <div class="nav-item active" onclick="showTab('home', this)">
-                    <span class="nav-icon">🏠</span>
-                    <p>Accueil</p>
-                </div>
-                <div class="nav-item" onclick="showTab('booking', this)">
-                    <span class="nav-icon">📅</span>
-                    <p>Rendez-vous</p>
-                </div>
-                <div class="nav-item" onclick="showTab('profile', this)">
-                    <span class="nav-icon">👤</span>
-                    <p>Profil</p>
-                </div>
-            </nav>
-        </section>
+<nav class="bottom-nav">
+    <div class="nav-item active" onclick="showTab('home', this)">
+        <span class="nav-icon">🏠</span>
+        <p id="nav-home">Accueil</p>
     </div>
+    <div class="nav-item" onclick="showTab('booking', this)">
+        <span class="nav-icon">📅</span>
+        <p id="nav-booking">Rendez-vous</p>
+    </div>
+    <div class="nav-item" onclick="showTab('profile', this)">
+        <span class="nav-icon">👤</span>
+        <p id="nav-profile">Profil</p>
+    </div>
+</nav>
 
     <!-- Bibliothèques -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -140,7 +146,8 @@
             // Gérer l'état actif du menu
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             element.classList.add('active');
-        }
+        } 
+        
     </script>
 </body>
 </html>
