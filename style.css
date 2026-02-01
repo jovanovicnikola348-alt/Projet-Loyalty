@@ -1,13 +1,18 @@
+/* NOUVEAU THÈME "ÉLÉGANCE CHALEUREUSE" */
+
 :root {
-    --primary: #5A5A5A;       /* Gris foncé pour texte principal/actif */
-    --secondary: #999999;     /* Gris clair pour textes secondaires */
-    --accent: #C0C0C0;        /* Gris très clair pour les séparations/bords */
+    --primary: #A0522D;       /* Couleur principale : Sienne (Marron terre) */
+    --secondary: #F4A460;     /* Couleur secondaire : Orange sable (Touche d'or) */
+    --accent: #E0E0E0;        /* Gris très clair pour les séparations/bords */
     --bg-light: #FFFFFF;      /* FOND BLANC PUR */
     --bg-dark: #1A1A1A;       /* Noir/Gris foncé pour l'admin */
     --text-dark: #1A1A1A;     /* Texte principal (Noir) */
-    --link-color: #5A5A5A;
+    --link-color: var(--primary);
+    --gold: #FFD700;          /* Or pour l'admin et l'accentuation */
+    --shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Ombre légère */
 }
 
+/* 1. Base et Typographie */
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg-light);
@@ -26,21 +31,23 @@ body {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    box-shadow: none; /* Pas d'ombre pour le look très plat */
+    box-shadow: var(--shadow);
 }
 
 header h1 {
-    font-family: 'Playfair Display', serif;
-    color: var(--text-dark);
+    font-family: 'Playfair Display', serif; /* Inspiré de 'test' */
+    color: var(--primary); /* Titre en couleur principale */
     text-align: center;
-    letter-spacing: 3px; 
+    letter-spacing: 2px;
     padding: 30px 0 20px;
     margin: 0;
-    font-size: 30px;
-    border-bottom: 1px solid #E0E0E0;
+    font-size: 32px;
+    border-bottom: 1px solid var(--accent);
 }
 
-/* Sections */
+#admin-subtitle { color: var(--secondary); font-size: 16px; margin-top: -15px; margin-bottom: 10px; }
+
+/* 2. Sections & Onglets */
 section { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
 .tab-content { 
     padding: 20px; 
@@ -53,84 +60,86 @@ section { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; ov
 }
 #tab-booking { padding: 0; }
 
-/* Formulaires & Boutons */
+/* 3. Formulaires & Boutons */
 input {
     width: 100%; padding: 15px; margin: 12px 0;
-    background: white; border: 1px solid #E0E0E0; color: var(--text-dark); border-radius: 5px;
-    box-shadow: none; /* Plus plat */
+    background: var(--bg-light); border: 1px solid var(--accent); color: var(--text-dark); border-radius: 5px;
+    transition: border-color 0.2s;
 }
 input:focus { border-color: var(--primary); outline: none; }
 
 button {
     width: 100%; padding: 15px; border: none; border-radius: 5px;
     font-weight: bold; cursor: pointer; margin-top: 15px;
-    box-shadow: none; /* Plus plat */
-    transition: background-color 0.2s;
+    transition: opacity 0.2s, background-color 0.2s;
 }
 button:active { opacity: 0.8; }
 
-.primary-btn { background: var(--text-dark); color: var(--bg-light); } /* Texte noir sur fond blanc, bouton principal noir */
+.primary-btn { background: var(--primary); color: var(--bg-light); } 
 .secondary-btn { 
     background: var(--bg-light); 
-    color: var(--text-dark); 
-    border: 1px solid var(--text-dark);
+    color: var(--primary); 
+    border: 1px solid var(--primary);
 }
-.google-btn { background: white; color: var(--text-dark); border: 1px solid #E0E0E0; }
+.google-btn { background: var(--bg-light); color: var(--text-dark); border: 1px solid var(--accent); }
 
 .auth-buttons { display: flex; gap: 10px; } 
 .auth-buttons button { flex: 1; margin-top: 15px; }
 
-.separator { margin: 25px 0; color: var(--secondary); font-size: 14px; text-align: center;}
+.separator { margin: 25px 0; color: var(--accent); font-size: 14px; text-align: center;}
 .small-link { color: var(--link-color); font-size: 12px; margin-top: 15px; cursor: pointer; text-align: center;}
-.error-message { color: red; font-size: 12px; display: block; margin-top: -10px; text-align: left; margin-bottom: 5px;}
+.error-message { color: #c0392b; font-size: 12px; display: block; margin-top: -10px; text-align: left; margin-bottom: 5px;}
 
-/* Cartes (Fidélité & RDV) */
+/* 4. Cartes (Fidélité & RDV) */
 .status-card {
-    background: white; padding: 25px; border-radius: 10px;
-    margin-bottom: 20px; border: 1px solid #E0E0E0;
-    box-shadow: none; /* Pas d'ombre */
+    background: var(--bg-light); padding: 25px; border-radius: 10px;
+    margin-bottom: 20px; border: 1px solid var(--accent);
+    box-shadow: var(--shadow);
     text-align: center;
 }
 #appointment-card-profile { border: 1px solid var(--primary); }
+.profile-box { text-align: center; padding: 15px; border: 1px solid var(--accent); border-radius: 5px; margin-top: 20px; }
+#user-email-display { font-weight: bold; }
 
-.label-gold { color: var(--primary); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin: 0; }
-#points-display { font-size: 52px; font-weight: 700; margin: 10px 0; color: var(--text-dark); }
+.label-gold { color: var(--secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin: 0; }
+#points-display { font-size: 52px; font-family: 'Playfair Display', serif; font-weight: 700; margin: 10px 0; color: var(--primary); }
+#gift-msg { color: #e67e22; font-weight: bold; margin-top: 10px; }
 
 /* Barre de progression */
-.progress-container { background: #E0E0E0; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 10px; }
-#progress-bar { background: var(--primary); height: 100%; width: 0%; transition: width 0.5s ease-in-out; }
+.progress-container { background: var(--accent); height: 10px; border-radius: 5px; overflow: hidden; margin-top: 10px; }
+#progress-bar { background: var(--secondary); height: 100%; width: 0%; transition: width 0.5s ease-in-out; }
 
 /* QR Code */
 .qr-section { text-align: center; margin-top: 30px; }
-.qr-container { background: white; padding: 20px; display: inline-block; border-radius: 10px; border: 1px solid #E0E0E0; }
+.qr-container { background: var(--bg-light); padding: 20px; display: inline-block; border-radius: 10px; border: 1px solid var(--accent); box-shadow: var(--shadow); }
 .qr-container > div { line-height: 0; }
 
-/* Navigation basse */
+/* 5. Navigation basse */
 .bottom-nav {
     position: fixed; bottom: 0; width: 100%; max-width: 450px; height: 75px;
     background: white;
     display: flex; justify-content: space-around;
-    align-items: center; border-top: 1px solid #E0E0E0; 
+    align-items: center; border-top: 1px solid var(--accent); 
     z-index: 1000;
-    box-shadow: 0 -1px 5px rgba(0,0,0,0.05); /* Ombre très légère */
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
     padding: 0 5px;
 }
 
-.nav-item { text-align: center; color: var(--secondary); font-size: 10px; cursor: pointer; flex: 1; padding-top: 5px;}
+.nav-item { text-align: center; color: var(--secondary); font-size: 10px; cursor: pointer; flex: 1; padding-top: 5px; transition: color 0.2s;}
 .nav-item.active { color: var(--primary); font-weight: bold; }
 .nav-icon { font-size: 24px; display: block; margin-bottom: 2px; }
 
 /* Iframe Setmore */
 iframe { width: 100%; height: 100%; border: none; background: white; border-radius: 8px; }
 
-/* HISTORIQUE CLIENT */
+/* 6. HISTORIQUE CLIENT */
 #visit-history-client { margin-top: 20px; }
 .history-item-client {
-    background: white;
+    background: var(--bg-light);
     padding: 10px 15px;
     margin-bottom: 8px;
     border-radius: 5px;
-    border: 1px solid #E0E0E0;
+    border: 1px solid var(--accent);
     font-size: 14px;
     display: flex;
     justify-content: space-between;
@@ -138,12 +147,50 @@ iframe { width: 100%; height: 100%; border: none; background: white; border-radi
 }
 .history-item-client span { color: var(--secondary); font-size: 12px; }
 
-/* Admin Styles (Ajustement pour le nouveau thème) */
+/* 7. Styles Admin (Adaptation au nouveau thème) */
 #admin-main { padding-bottom: 90px; }
-.user-card { background: var(--bg-dark); padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 3px solid var(--primary); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-.badge { background: var(--primary); color: var(--bg-dark); padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
-.modal { background: rgba(0,0,0,0.85); }
-.modal-content { background: var(--bg-dark); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); }
-.point-controls { gap: 15px; }
-.btn-min, .btn-plus { width: 45px; height: 45px; font-size: 22px; border-radius: 50%; background: var(--secondary); color: white; }
-.history-item { color: var(--gray-text); }
+.user-card { 
+    background: var(--bg-dark); 
+    color: var(--bg-light); 
+    padding: 15px; 
+    margin-bottom: 10px; 
+    border-radius: 5px; 
+    border-left: 3px solid var(--primary); 
+    cursor: pointer; 
+    box-shadow: var(--shadow); 
+}
+.search-bar input { background-color: var(--bg-light); border: 1px solid var(--accent); color: var(--text-dark); }
+.badge { background: var(--secondary); color: var(--text-dark); padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
+.modal { background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; }
+.modal-content { 
+    background: var(--bg-dark); 
+    padding: 30px; 
+    border-radius: 10px; 
+    border: 2px solid var(--primary); 
+    max-width: 90%;
+    color: var(--bg-light);
+}
+.modal h2 { font-family: 'Playfair Display', serif; color: var(--secondary); margin-top: 0; }
+.modal h3 { color: var(--secondary); margin-top: 20px; border-bottom: 1px solid #333; padding-bottom: 5px; }
+
+.point-controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px;}
+.point-controls span { font-size: 40px; font-weight: bold; color: var(--secondary); }
+
+.btn-min, .btn-plus { 
+    width: 50px; height: 50px; font-size: 26px; border-radius: 50%; 
+    background: var(--primary); color: var(--bg-light); margin: 0;
+    display: flex; justify-content: center; align-items: center;
+}
+
+#close-scanner { background: #666 !important; }
+
+.history-item { 
+    font-size: 14px; 
+    padding: 8px; 
+    border-bottom: 1px dashed #333; 
+    color: #ccc; 
+}
+
+/* Nouveaux boutons Admin */
+#use-reward { background-color: var(--secondary) !important; color: var(--text-dark) !important; }
+#delete-user-btn { background-color: #c0392b !important; color: var(--bg-light) !important; }
