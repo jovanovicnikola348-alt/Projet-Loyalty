@@ -89,7 +89,6 @@ async function updateAppointmentUI(email) {
 // --- 3. INITIALISATION & LOGIQUE INSCRIPTION/LOGIN ---
 document.addEventListener('DOMContentLoaded', () => {
     const savedLang = localStorage.getItem('userLang') || 'fr';
-    // CORRECTION LANGUE : SI DETECTE SR, ON MET SR, SINON ON GARDE LE SAVED OU FR
     const detectedLang = navigator.language.startsWith('sr') ? 'sr' : savedLang;
     updateLanguage(detectedLang);
 
@@ -194,12 +193,10 @@ document.getElementById('btn-signup').onclick = () => {
     const p = document.getElementById('password').value;
     const username = document.getElementById('username').value;
     
-    // Récupération des spans
     const emailErrorSpan = document.getElementById('email-error');
     const usernameErrorSpan = document.getElementById('username-error');
     const passErrorSpan = document.getElementById('password-error');
     
-    // Réinitialisation
     emailErrorSpan.innerText = ''; usernameErrorSpan.innerText = ''; passErrorSpan.innerText = '';
     emailErrorSpan.style.display = 'none'; usernameErrorSpan.style.display = 'none'; passErrorSpan.style.display = 'none';
 
