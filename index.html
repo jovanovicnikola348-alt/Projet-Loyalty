@@ -9,15 +9,12 @@
     <link rel="icon" href="data:,">
 </head>
 <body>
-
     <div id="app">
         <header>
             <h1>Friz kod Francuza</h1>
         </header>
 
-        <!-- ==========================================
-             SECTION CONNEXION / LOGIN
-        =========================================== -->
+        <!-- SECTION CONNEXION (Login/Signup) -->
         <section id="login-section">
             <div style="text-align: right; margin-bottom: 15px;">
                 <select id="lang-select" class="lang-dropdown">
@@ -33,9 +30,7 @@
             <input type="password" id="password" placeholder="Mot de passe">
             
             <div class="auth-buttons">
-                <!-- Le bouton Login est affiché par défaut -->
                 <button id="btn-login" class="primary-btn">Se connecter</button>
-                <!-- Le bouton Signup est caché par défaut (visible lors de l'inscription) -->
                 <button id="btn-signup" class="secondary-btn" style="display:none;">Inscription</button>
             </div>
 
@@ -46,14 +41,11 @@
                 <span id="txt-google">Continuer avec Google</span>
             </button>
             
-            <!-- Lien unique pour basculer entre Login et Signup -->
             <p id="toggle-signup" class="small-link">Vous n'avez pas de compte ? S'inscrire</p>
         </section>
 
-        <!-- ==========================================
-             SECTION CLIENT (Une fois connecté)
-        =========================================== -->
-        <section id="client-section" style="display: none; padding: 0;">
+        <!-- SECTION CLIENT -->
+        <section id="client-section" style="display: none;">
             
             <!-- ONGLET 1 : ACCUEIL (Points) -->
             <div id="tab-home" class="tab-content">
@@ -62,7 +54,6 @@
                     <h3 id="next-appointment-date">...</h3>
                     <p id="next-appointment-time"></p>
                 </div>
-
                 <div class="status-card">
                     <h3 id="txt-loyalty">Ma Fidélité</h3>
                     <div id="points-display">0 / 5</div>
@@ -71,7 +62,6 @@
                     </div>
                     <p id="gift-msg" style="display: none;"></p>
                 </div>
-
                 <div class="qr-section">
                     <p id="txt-show-qr">Présentez ce code au salon :</p>
                     <div class="qr-container">
@@ -83,9 +73,7 @@
             <!-- NOUVEL ONGLET 2 : HISTORIQUE -->
             <div id="tab-history" class="tab-content">
                 <h2 id="history-title">Historique des visites</h2>
-                <div id="visit-history-client">
-                    <!-- Les visites s'afficheront ici -->
-                </div>
+                <div id="visit-history-client"></div>
             </div>
 
             <!-- ONGLET 3 : RÉSERVATION (Setmore Iframe) -->
@@ -115,11 +103,10 @@
                         <option value="en">🇬🇧 English</option>
                     </select>
                 </div>
-
                 <button id="btn-logout" class="secondary-btn" style="margin-top: 30px;">Déconnexion</button>
             </div>
 
-            <!-- BARRE DE NAVIGATION BASSE (Reste identique) -->
+            <!-- BARRE DE NAVIGATION BASSE (Nettoyée) -->
             <nav class="bottom-nav">
                 <div class="nav-item active" onclick="showTab('home', this)">
                     <span class="nav-icon">🏠</span>
@@ -141,19 +128,16 @@
         </section>
     </div>
 
-    <!-- Bibliothèques -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script type="module" src="app.js"></script>
 
-    <!-- Script de navigation rapide (modifié pour inclure l'événement de rafraîchissement) -->
     <script>
         function showTab(tabName, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
-            document.getElementById('tab-' + tabName).style.display = 'flex'; // Affichage en flex pour les contenus
+            document.getElementById('tab-' + tabName).style.display = 'flex';
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             element.classList.add('active');
 
-            // Déclenche le rafraîchissement du RDV quand on quitte l'onglet Booking
             if (tabName === 'home' || tabName === 'profile') {
                 window.dispatchEvent(new Event('refreshAppointments'));
             }
