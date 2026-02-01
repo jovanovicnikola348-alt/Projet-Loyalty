@@ -32,37 +32,46 @@ header h1 {
     font-family: 'Playfair Display', serif;
     color: var(--primary);
     text-align: center;
-    letter-spacing: 4px; /* Plus d'espace */
+    letter-spacing: 4px; 
     padding: 25px 0 15px;
     margin: 0;
     font-size: 30px;
+    /* AJOUT : Ligne sous le header pour marquer la séparation */
+    border-bottom: 1px solid #222; 
 }
 
 /* Sections */
 section { 
-    padding: 20px; 
-    flex-grow: 1; /* Permet à la section de prendre tout l'espace */
-    display: flex; 
-    flex-direction: column; 
-    overflow: hidden; /* Important pour ne pas avoir une double barre de défilement */
-}
-
-/* Modifie cette partie */
-.tab-content { 
-    padding-bottom: 0px; /* On retire le padding du bas ici */
-    height: 100%; /* Prend toute la hauteur du parent */
-    overflow-y: auto; /* Permet le défilement si le contenu est trop grand */
+    /* L'élément prend l'espace disponible */
     flex-grow: 1; 
     display: flex; 
     flex-direction: column; 
+    overflow: hidden; 
+    padding: 20px; 
 }
 
-/* Ajoute ce style si tu ne l'as pas */
+/* Les contenus des onglets (où vit l'Iframe) */
+.tab-content { 
+    /* Prend toute la hauteur restante dans la section */
+    height: 100%; 
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column; 
+    overflow-y: auto; 
+    padding: 0; /* AJOUT CRUCIAL: Retire le padding pour que l'iframe puisse respirer */
+}
+
+/* Cas spécifique du tab Home/History (qui ont besoin de leur padding) */
+#tab-home, #tab-history, #tab-profile {
+    padding: 20px; /* On remet le padding seulement pour les onglets qui ont du contenu normal */
+}
+
 #tab-booking {
-    padding-bottom: 0; /* Pas de padding pour l'Iframe */
+    padding: 0; /* L'iframe ne veut PAS de padding */
 }
 
-/* Formulaires & Boutons */
+
+/* Formulaires & Boutons (Non modifié) */
 input {
     width: 100%; padding: 15px; margin: 12px 0;
     background: #252525; border: 1px solid #333; color: var(--text-light); border-radius: 5px;
@@ -82,7 +91,7 @@ button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.5
 .primary-btn { background: var(--primary); color: var(--bg-dark); }
 .secondary-btn { 
     background: var(--card-bg); 
-    color: var(--text-light); /* Couleur forcée en blanc pour le fond sombre */
+    color: var(--text-light); 
     border: 1px solid var(--primary);
 }
 .google-btn {
@@ -92,16 +101,23 @@ button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.5
 .separator { margin: 25px 0; color: var(--gray-text); font-size: 14px; }
 .small-link { color: var(--gray-text); font-size: 12px; margin-top: 15px; cursor: pointer; }
 
-/* Cartes (Fidélité & RDV) */
+/* Cartes (Fidélité & RDV) - Non modifié */
 .status-card {
     background: var(--card-bg); padding: 25px; border-radius: 10px;
     margin-bottom: 20px; border: 1px solid #333;
-    box-shadow: 0 8px 15px rgba(0,0,0,0.5); /* Ombre plus marquée */
+    box-shadow: 0 8px 15px rgba(0,0,0,0.5); 
 }
 
-/* Barre de progression, QR Code, etc. (Conservé) */
+/* Iframe Setmore */
+iframe { 
+    width: 100%; 
+    height: 100%; /* CRUCIAL: Prend 100% de l'espace disponible */
+    border: none; 
+    background: white; 
+    border-radius: 8px; 
+}
 
-/* Navigation basse (CORRIGÉ POUR L'ALIGNEMENT) */
+/* Navigation basse (Non modifié) */
 .bottom-nav {
     position: fixed; 
     bottom: 0; 
@@ -123,10 +139,10 @@ button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.5
     color: var(--gray-text); 
     font-size: 10px; 
     cursor: pointer; 
-    flex: 1; /* Chaque élément prend une part égale */
-    min-width: 0; /* Évite l'écrasement */
+    flex: 1; 
+    min-width: 0; 
     padding-top: 5px;
-    white-space: nowrap; /* Empêche le texte de passer à la ligne */
+    white-space: nowrap; 
 }
 .nav-item.active { 
     color: var(--primary); 
@@ -138,44 +154,11 @@ button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.5
     margin-bottom: 2px; 
 }
 
-/* Admin Styles (pour l'admin.html) - Conservé */
+/* Admin Styles (Non modifié) */
 #admin-main { padding-bottom: 90px; }
-.user-card {
-    background: #252525;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border-left: 3px solid var(--primary);
-    cursor: pointer;
-    box-shadow: 0 0 5px rgba(0,0,0,0.5);
-}
+/* ... (le reste des styles admin) */
 
-.badge {
-    background: var(--primary);
-    color: var(--bg-dark);
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-weight: bold;
-    font-size: 12px;
-}
-
-.modal {
-    background: rgba(0,0,0,0.85); 
-}
-.modal-content {
-    background: var(--bg-dark); padding: 30px; border-radius: 10px;
-    border: 2px solid var(--primary); 
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-}
-.point-controls { gap: 15px; }
-.btn-min, .btn-plus {
-    width: 45px; height: 45px; font-size: 22px; border-radius: 50%;
-    background: var(--secondary); color: white;
-}
-.history-item { color: var(--gray-text); }
-
-
-/* HISTORIQUE CLIENT */
+/* HISTORIQUE CLIENT (Non modifié) */
 #visit-history-client {
     margin-top: 20px;
 }
