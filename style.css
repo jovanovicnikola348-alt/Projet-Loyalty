@@ -39,8 +39,28 @@ header h1 {
 }
 
 /* Sections */
-section { padding: 20px; }
-.tab-content { padding-bottom: 90px; height: calc(100vh - 160px); overflow-y: auto; }
+section { 
+    padding: 20px; 
+    flex-grow: 1; /* Permet à la section de prendre tout l'espace */
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; /* Important pour ne pas avoir une double barre de défilement */
+}
+
+/* Modifie cette partie */
+.tab-content { 
+    padding-bottom: 0px; /* On retire le padding du bas ici */
+    height: 100%; /* Prend toute la hauteur du parent */
+    overflow-y: auto; /* Permet le défilement si le contenu est trop grand */
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column; 
+}
+
+/* Ajoute ce style si tu ne l'as pas */
+#tab-booking {
+    padding-bottom: 0; /* Pas de padding pour l'Iframe */
+}
 
 /* Formulaires & Boutons */
 input {
