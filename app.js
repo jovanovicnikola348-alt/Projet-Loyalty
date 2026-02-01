@@ -125,9 +125,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Au démarrage, on affiche le Login par défaut
     if(usernameInput) usernameInput.style.display = 'none';
     if(document.getElementById('btn-signup')) document.getElementById('btn-signup').style.display = 'none';
-});
+}); // ... dans onAuthStateChanged (vers la ligne 128)
+// Affichage du nom si disponible
+const displayName = user.displayName || user.email.split('@')[0];
+const userEmailDisplay = document.getElementById('user-email-display');
+userEmailDisplay.innerText = displayName;
+userEmailDisplay.classList.add('gold-text'); // AJOUT DE LA CLASSE GOLD
+// ... (le reste du code)
 
-// --- 4. AUTH & TEMPS RÉEL ---
+// --- 4. A UTH & TEMPS RÉEL ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         document.getElementById('login-section').style.display = 'none';
@@ -147,10 +153,12 @@ onAuthStateChanged(auth, async (user) => {
                 const currentLang = localStorage.getItem('userLang') || 'fr';
                 
                 // Points
-                document.getElementById('points-display').innerText = `${data.points} / 5`;
-                document.getElementById('progress-bar').style.width = (data.points / 5 * 100) + "%";
-                document.getElementById('gift-msg').style.display = data.points >= 5 ? 'block' : 'none';
-                document.getElementById('gift-msg').innerText = langData[currentLang].gift;
+                // ... dans onAuthStateChanged > onSnapshot (vers la ligne 153)
+// Points
+document.getElementById('points-display').innerText = `${data.points} / 5`;
+document.getElementById('points-display').classList.add('gold-text'); // AJOUT DE LA CLASSE GOLD
+document.getElementById('progress-bar').style.width = (data.points / 5 * 100) + "%";
+// ... (le reste du code)
 
                 // QR Code
                 document.getElementById('qrcode').innerHTML = "";

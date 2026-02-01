@@ -1,23 +1,29 @@
+/* Import des Polices Replit */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+/* Charte Graphique Replit */
 :root {
-    --primary: #D4AF37;       /* Or */
-    --secondary: #6F4E37;     /* Brun Café */
-    --bg-dark: #0A0A0A;       /* Noir Profond */
-    --card-bg: #1C1C1C;       /* Gris Foncé */
-    --text-light: #F0F0F0;    /* Blanc Cassé (Principal) */
-    --gray-text: #AAAAAA;     /* Gris Clair */
-    --danger: #e74c3c;        /* Rouge */
-    --header-height: 85px;    /* Hauteur estimée du titre + padding */
-    --nav-height: 75px;       /* Hauteur de la barre de navigation du bas */
+    --primary: hsl(45 93% 47%);       /* Or/Ambre (Accent) */
+    --primary-text: hsl(222 47% 11%); /* Texte sur l'accent */
+    --bg-dark: hsl(222 47% 11%);      /* Fond très sombre (Slate 950) */
+    --bg-light: hsl(210 40% 98%);     /* Presque Blanc (Foreground) */
+    --card: hsl(217 33% 17%);         /* Gris-Bleu foncé (Card) */
+    --text-color: hsl(210 40% 98%);   /* Blanc cassé */
+    --border-color: hsl(217 33% 20%); /* Bordure sombre */
+
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Outfit', sans-serif;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-body);
     background-color: var(--bg-dark);
-    color: var(--text-light);
+    color: var(--text-color);
     margin: 0;
     display: flex;
     justify-content: center;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
 }
 
 #app {
@@ -28,107 +34,109 @@ body {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3); 
 }
 
 header h1 {
-    font-family: 'Playfair Display', serif;
-    color: var(--primary);
+    font-family: var(--font-display);
+    color: var(--text-color);
     text-align: center;
-    letter-spacing: 4px;
+    letter-spacing: 4px; 
     padding: 25px 0 15px;
     margin: 0;
     font-size: 30px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* ---------------------------------------------------- */
-/* SECTIONS & CONTENEURS PRINCIPAUX (Clé de la correction) */
-/* ---------------------------------------------------- */
+/* Général */
+section { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+.tab-content { padding-bottom: 90px; height: calc(100vh - 160px); overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; }
+#tab-booking { padding: 0; height: calc(100vh - 75px); }
 
-#client-section {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 0; 
-    /* Hauteur restante de l'écran après le Header et la Nav */
-    height: calc(100vh - var(--header-height)); 
-    overflow: hidden;
-}
-
-.tab-content { 
-    height: 100%; /* Prend toute la hauteur du parent */
-    overflow-y: auto; /* Défilement pour les contenus (Accueil, Historique, Profil) */
-    flex-grow: 1; 
-    display: flex; 
-    flex-direction: column; 
-    padding: 20px;
-}
-
-/* Exception pour l'onglet Booking (Iframe) */
-#tab-booking {
-    /* La hauteur de l'Iframe doit être la hauteur totale de l'écran moins le header et la nav */
-    height: calc(100vh - var(--header-height) - var(--nav-height)); 
-    padding: 0; /* Pas de padding pour l'Iframe */
-}
-
-/* ---------------------------------------------------- */
-/* FORMULAIRES & BOUTONS */
-/* ---------------------------------------------------- */
-
+/* Formulaires & Boutons */
 input {
     width: 100%; padding: 15px; margin: 12px 0;
-    background: #252525; border: 1px solid #333; color: var(--text-light); border-radius: 5px;
+    background: var(--card); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-    transition: border-color 0.2s;
 }
 input:focus { border-color: var(--primary); outline: none; }
 
 button {
     width: 100%; padding: 15px; border: none; border-radius: 5px;
-    font-weight: bold; cursor: pointer; margin-top: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: 600; /* Plus de Bold */
+    cursor: pointer; margin-top: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: all 0.2s;
 }
-button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
-.primary-btn { background: var(--primary); color: var(--bg-dark); }
+.primary-btn { background: var(--primary); color: var(--primary-text); }
 .secondary-btn { 
-    background: var(--card-bg); 
-    color: var(--text-light); 
-    border: 1px solid var(--primary);
+    background: var(--card); 
+    color: var(--text-color); 
+    border: 1px solid var(--border-color);
 }
 .google-btn {
-    background: var(--card-bg); color: var(--text-light); border: 1px solid #444;
+    background: var(--card); 
+    color: var(--text-color); 
+    border: 1px solid var(--border-color);
 }
 
-.separator { margin: 25px 0; color: var(--gray-text); font-size: 14px; }
-.small-link { color: var(--gray-text); font-size: 12px; margin-top: 15px; cursor: pointer; }
+.separator { margin: 25px 0; color: var(--text-color); font-size: 14px; }
+.small-link { color: var(--primary); font-size: 12px; margin-top: 15px; cursor: pointer; }
 
-/* ---------------------------------------------------- */
-/* CARTES & QR CODE */
-/* ---------------------------------------------------- */
-
-.status-card {
-    background: var(--card-bg); padding: 25px; border-radius: 10px;
-    margin-bottom: 20px; border: 1px solid #333;
-    box-shadow: 0 8px 15px rgba(0,0,0,0.5);
+/* Cartes (Fidélité & RDV) */
+.status-card, .profile-box {
+    background: var(--card); 
+    padding: 25px; 
+    border-radius: 8px;
+    margin-bottom: 20px; 
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5); 
 }
 
-.label-gold { color: var(--primary); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin: 0; }
-#points-display { font-size: 52px; font-weight: 700; margin: 10px 0; text-align: center; color: var(--primary); }
+.gold-text { /* Nouvelle classe pour le look Or/Ambre */
+    background: linear-gradient(135deg, var(--primary) 0%, hsl(35 90% 60%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+}
 
-.progress-container { background: #333; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 10px; }
+.label-gold { 
+    color: var(--primary); /* Utilisé pour les étiquettes */
+    font-weight: 500; 
+}
+
+#points-display { 
+    font-family: var(--font-display); 
+    font-size: 56px; 
+    font-weight: 700; 
+    margin: 10px 0; 
+}
+
+/* Barre de progression */
+.progress-container { background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 10px; }
 #progress-bar { background: var(--primary); height: 100%; width: 0%; transition: width 0.5s ease-in-out; }
 
+/* QR Code */
 .qr-section { text-align: center; margin-top: 30px; }
-.qr-container { background: white; padding: 20px; display: inline-block; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+.qr-container { background: var(--bg-light); padding: 20px; display: inline-block; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
 
-/* ---------------------------------------------------- */
-/* HISTORIQUE CLIENT */
-/* ---------------------------------------------------- */
+/* Navigation basse */
+.bottom-nav {
+    position: fixed; bottom: 0; width: 100%; max-width: 450px; height: 75px;
+    background: var(--card); 
+    display: flex; justify-content: space-around;
+    align-items: center; border-top: 1px solid var(--border-color); 
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+.nav-item { color: hsl(215 20% 65%); /* Muted foreground */ }
+.nav-item.active { color: var(--primary); }
 
-#visit-history-client { margin-top: 20px; }
+/* Historique */
 .history-item-client {
-    background: #252525;
+    background: var(--card);
     padding: 10px 15px;
     margin-bottom: 8px;
     border-radius: 5px;
@@ -138,92 +146,7 @@ button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.5
     justify-content: space-between;
     align-items: center;
 }
-.history-item-client span { color: var(--gray-text); font-size: 12px; }
+.history-item-client span { color: var(--text-color); font-size: 12px; }
 
-/* ---------------------------------------------------- */
-/* NAVIGATION BASSE (Fix Alignement) */
-/* ---------------------------------------------------- */
-
-.bottom-nav {
-    position: fixed; 
-    bottom: 0; 
-    width: 100%; 
-    max-width: 450px; 
-    height: var(--nav-height); 
-    background: var(--card-bg); 
-    display: flex; 
-    justify-content: space-around; 
-    align-items: center; 
-    border-top: 1px solid var(--primary); 
-    z-index: 1000;
-    box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
-    padding: 0 5px; 
-}
-
-.nav-item { 
-    text-align: center; 
-    color: var(--gray-text); 
-    font-size: 10px; 
-    cursor: pointer; 
-    flex: 1; 
-    min-width: 0; 
-    padding-top: 5px;
-    white-space: nowrap;
-}
-.nav-item.active { color: var(--primary); font-weight: bold; }
-.nav-icon { font-size: 24px; display: block; margin-bottom: 2px; }
-
-/* ---------------------------------------------------- */
-/* IFRAME SETMORE (Fix pour les cookies) */
-/* ---------------------------------------------------- */
-
-iframe { 
-    width: 100%; 
-    height: 100%; 
-    border: none; 
-    background: white; 
-    border-radius: 0; /* Pas de bordure pour l'Iframe si elle prend tout l'espace */
-}
-
-
-/* ---------------------------------------------------- */
-/* STYLES ADMIN */
-/* ---------------------------------------------------- */
-
-#admin-main { padding-bottom: 90px; }
-.user-card {
-    background: #252525;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border-left: 3px solid var(--primary);
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-}
-
-.badge {
-    background: var(--primary);
-    color: var(--bg-dark);
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-weight: bold;
-    font-size: 12px;
-}
-
-.modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center;
-    z-index: 2000;
-}
-.modal-content {
-    background: var(--bg-dark); padding: 30px; border-radius: 10px;
-    border: 2px solid var(--primary); 
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-    width: 90%; max-width: 400px;
-}
-.point-controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin: 20px 0; }
-.btn-min, .btn-plus {
-    width: 45px; height: 45px; font-size: 22px; border-radius: 50%;
-    background: var(--secondary); color: white;
-}
-.history-item { color: var(--gray-text); font-size: 14px; text-align: left; }
+/* Admin Styles (maintenus) */
+.modal-content { border: 2px solid var(--primary); }
