@@ -2,27 +2,21 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friz kod Francuza - Loyalty</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Polices pour le look Pro -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:,"> 
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:,">
 </head>
 <body>
-
     <div id="app">
         <header>
-            <h1 class="header-title">Friz kod Francuza</h1>
+            <h1>Friz kod Francuza</h1>
         </header>
 
-        <!-- ==========================================
-             SECTION CONNEXION / LOGIN (Adapté au design)
-        =========================================== -->
-        <section id="login-section" class="content-padding">
-            <div class="lang-selector-top">
+        <!-- SECTION CONNEXION (Login/Signup) -->
+        <section id="login-section">
+            <div style="text-align: right; margin-bottom: 15px;">
                 <select id="lang-select" class="lang-dropdown">
                     <option value="fr">🇫🇷 FR</option>
                     <option value="sr">🇷🇸 SR</option>
@@ -30,138 +24,123 @@
                 </select>
             </div>
 
-            <h2 id="txt-title" class="section-title gold-text">Connexion</h2>
-            
+            <h2 id="txt-title">Connexion</h2>
             <input type="email" id="email" placeholder="Email">
-            <input type="text" id="username" placeholder="Nom/Pseudo" class="hidden-input"> 
+            <input type="text" id="username" placeholder="Nom/Pseudo" style="display:none;">
             <input type="password" id="password" placeholder="Mot de passe">
             
-            <button id="btn-login" class="btn primary-btn" data-text="Se connecter">Se connecter</button>
-            <button id="btn-signup" class="btn secondary-btn hidden-input" data-text="Inscription">Inscription</button>
+            <div class="auth-buttons">
+                <button id="btn-login" class="primary-btn">Se connecter</button>
+                <button id="btn-signup" class="secondary-btn" style="display:none;">Inscription</button>
+            </div>
 
-            <p id="toggle-signup" class="small-link">Vous n'avez pas de compte ? S'inscrire</p>
-            
             <div class="separator">— OR —</div>
 
-            <button id="btn-google" class="btn google-btn">
+            <button id="btn-google" class="google-btn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
                 <span id="txt-google">Continuer avec Google</span>
             </button>
+            
+            <p id="toggle-signup" class="small-link">Vous n'avez pas de compte ? S'inscrire</p>
         </section>
 
-        <!-- ==========================================
-             SECTION CLIENT (Design Replit)
-        =========================================== -->
+        <!-- SECTION CLIENT -->
         <section id="client-section" style="display: none;">
             
-            <!-- ONGLET 1 : ACCUEIL (Design Card) -->
-            <div id="tab-home" class="tab-content content-padding">
-
-                <!-- Carte de Fidélité (Look verre/premium) -->
-                <div class="loyalty-card">
-                    <div class="card-header">
-                        <span class="card-tag">FIDÉLITÉ</span>
-                        <h3 id="txt-loyalty" class="card-title gold-text">Ma Fidélité</h3>
-                    </div>
-                    
-                    <div class="points-progress-area">
-                        <p class="points-label">PROCHAIN CADEAU</p>
-                        <div id="points-display" class="points-number gold-text">0 / 5</div>
-                        <div class="progress-bar-container">
-                            <div id="progress-bar" class="progress-bar-fill"></div>
-                        </div>
-                    </div>
-                    
-                    <p id="gift-msg" class="gift-message" style="display: none;">🎁 Coupe offerte !</p>
+            <!-- ONGLET 1 : ACCUEIL (Points) -->
+            <div id="tab-home" class="tab-content">
+                <div id="appointment-card" style="display: none;">
+                    <p id="txt-next-apt" class="label-gold">Prochain RDV</p>
+                    <h3 id="next-appointment-date">...</h3>
+                    <p id="next-appointment-time"></p>
                 </div>
-
-                <!-- QR Code (Look verre/premium) -->
-                <div class="qr-panel">
-                    <p id="txt-show-qr" class="qr-instruction">Présentez ce code au salon :</p>
-                    <div class="qr-code-wrapper">
+                <div class="status-card">
+                    <h3 id="txt-loyalty">Ma Fidélité</h3>
+                    <div id="points-display">0 / 5</div>
+                    <div class="progress-container">
+                        <div id="progress-bar"></div>
+                    </div>
+                    <p id="gift-msg" style="display: none;"></p>
+                </div>
+                <div class="qr-section">
+                    <p id="txt-show-qr">Présentez ce code au salon :</p>
+                    <div class="qr-container">
                         <div id="qrcode"></div>
                     </div>
                 </div>
-
-                <!-- Carte Prochain RDV (Masquée) -->
-                <div id="appointment-card" class="appointment-card" style="display: none;">
-                    <p id="txt-next-apt" class="apt-label">Prochain RDV</p>
-                    <div class="apt-details">
-                        <span class="apt-icon">📅</span>
-                        <div>
-                            <p id="next-appointment-date" class="apt-date gold-text">...</p>
-                            <p id="next-appointment-time" class="apt-time">...</p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <!-- ONGLET 2 : HISTORIQUE -->
-            <div id="tab-history" class="tab-content content-padding" style="display: none;">
-                <h2 id="history-title" class="section-title gold-text">Mon Historique</h2>
-                <div id="visit-history-client" class="history-list">
-                    <!-- Les visites s'afficheront ici -->
-                </div>
+            <!-- NOUVEL ONGLET 2 : HISTORIQUE -->
+            <div id="tab-history" class="tab-content">
+                <h2 id="history-title">Historique des visites</h2>
+                <div id="visit-history-client"></div>
             </div>
 
-            <!-- ONGLET 3 : RÉSERVATION -->
-            <div id="tab-booking" class="tab-content" style="display: none;">
+            <!-- ONGLET 3 : RÉSERVATION (Setmore Iframe) -->
+            <div id="tab-booking" class="tab-content">
                 <iframe src="https://frizkodfrancuza.setmore.com" frameborder="0" allow="web-share; payment"></iframe>
             </div>
 
             <!-- ONGLET 4 : PROFIL -->
-            <div id="tab-profile" class="tab-content content-padding" style="display: none;">
-                <h2 id="txt-profile-title" class="section-title gold-text">Mon Profil</h2>
-                <div class="profile-info-box">
-                    <p class="profile-label">CONNECTÉ EN TANT QUE</p>
-                    <p id="user-email-display" class="profile-email gold-text"></p>
+            <div id="tab-profile" class="tab-content">
+                <h2 id="txt-profile-title" style="color: var(--primary);">Mon Profil</h2>
+                
+                <div id="appointment-card-profile" class="status-card" style="display: none;">
+                    <p class="label-gold">📅 Prochain RDV</p>
+                    <h3 id="next-appointment-date-profile">...</h3>
+                    <p id="next-appointment-time-profile"></p>
+                </div>
+
+                <div class="profile-box">
+                    <p id="user-email-display"></p>
                 </div>
 
                 <div class="lang-settings">
-                    <p id="txt-lang-label" class="lang-label">Changer la langue :</p>
-                    <select id="lang-select-profile" class="lang-dropdown">
+                    <label id="txt-lang-label">Changer la langue :</label>
+                    <select id="lang-select-profile" class="lang-dropdown" style="width: 100%; margin-top: 10px;">
                         <option value="fr">🇫🇷 Français</option>
                         <option value="sr">🇷🇸 Srpski</option>
                         <option value="en">🇬🇧 English</option>
                     </select>
                 </div>
-
-                <button id="btn-logout" class="btn secondary-btn logout-btn" data-text="Déconnexion">Déconnexion</button>
+                <button id="btn-logout" class="secondary-btn" style="margin-top: 30px;">Déconnexion</button>
             </div>
 
-            <!-- BARRE DE NAVIGATION BASSE -->
+            <!-- BARRE DE NAVIGATION BASSE (Nettoyée) -->
             <nav class="bottom-nav">
                 <div class="nav-item active" onclick="showTab('home', this)">
                     <span class="nav-icon">🏠</span>
-                    <p id="nav-home" class="nav-text">Accueil</p>
+                    <p id="nav-home">Accueil</p>
                 </div>
-                <div class="nav-item" onclick="showTab('history', this)"> 
+                <div class="nav-item" onclick="showTab('history', this)">
                     <span class="nav-icon">📜</span>
-                    <p id="nav-history" class="nav-text">Historique</p>
+                    <p id="nav-history">Historique</p>
                 </div>
                 <div class="nav-item" onclick="showTab('booking', this)">
                     <span class="nav-icon">📅</span>
-                    <p id="nav-booking" class="nav-text">Rendez-vous</p>
+                    <p id="nav-booking">Rendez-vous</p>
                 </div>
                 <div class="nav-item" onclick="showTab('profile', this)">
                     <span class="nav-icon">👤</span>
-                    <p id="nav-profile" class="nav-text">Profil</p>
+                    <p id="nav-profile">Profil</p>
                 </div>
             </nav>
         </section>
     </div>
 
-    <!-- Bibliothèques -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script type="module" src="app.js"></script>
 
-    <!-- Script de navigation rapide -->
     <script>
         function showTab(tabName, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
-            document.getElementById('tab-' + tabName).style.display = 'flex'; // Utiliser flex pour la mise en page
+            document.getElementById('tab-' + tabName).style.display = 'flex';
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             element.classList.add('active');
+
+            if (tabName === 'home' || tabName === 'profile') {
+                window.dispatchEvent(new Event('refreshAppointments'));
+            }
         }
     </script>
 </body>
