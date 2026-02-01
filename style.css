@@ -1,10 +1,10 @@
 :root {
-    --primary: #5A5A5A;       /* Gris foncé */
-    --secondary: #999999;     /* Gris clair (pour les détails) */
-    --bg-light: #F7F7F7;      /* Fond Crème/Blanc Cassé */
-    --bg-dark: #1A1A1A;       /* Noir des cartes */
-    --text-dark: #1A1A1A;     /* Texte principal */
-    --text-light: #F0F0F0;    /* Texte sur fond noir */
+    --primary: #5A5A5A;       /* Gris foncé pour texte principal/actif */
+    --secondary: #999999;     /* Gris clair pour textes secondaires */
+    --accent: #C0C0C0;        /* Gris très clair pour les séparations/bords */
+    --bg-light: #FFFFFF;      /* FOND BLANC PUR */
+    --bg-dark: #1A1A1A;       /* Noir/Gris foncé pour l'admin */
+    --text-dark: #1A1A1A;     /* Texte principal (Noir) */
     --link-color: #5A5A5A;
 }
 
@@ -26,14 +26,14 @@ body {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    box-shadow: none; /* Pas d'ombre pour le look très plat */
 }
 
 header h1 {
     font-family: 'Playfair Display', serif;
     color: var(--text-dark);
     text-align: center;
-    letter-spacing: 4px; 
+    letter-spacing: 3px; 
     padding: 30px 0 20px;
     margin: 0;
     font-size: 30px;
@@ -44,7 +44,7 @@ header h1 {
 section { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
 .tab-content { 
     padding: 20px; 
-    height: calc(100vh - 75px - 75px); /* Hauteur totale - Header - Nav Bar */
+    height: calc(100vh - 75px - 75px); 
     overflow-y: auto; 
     flex-grow: 1; 
     display: flex; 
@@ -57,19 +57,19 @@ section { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; ov
 input {
     width: 100%; padding: 15px; margin: 12px 0;
     background: white; border: 1px solid #E0E0E0; color: var(--text-dark); border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: none; /* Plus plat */
 }
 input:focus { border-color: var(--primary); outline: none; }
 
 button {
     width: 100%; padding: 15px; border: none; border-radius: 5px;
     font-weight: bold; cursor: pointer; margin-top: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: none; /* Plus plat */
+    transition: background-color 0.2s;
 }
-button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+button:active { opacity: 0.8; }
 
-.primary-btn { background: var(--text-dark); color: var(--bg-light); }
+.primary-btn { background: var(--text-dark); color: var(--bg-light); } /* Texte noir sur fond blanc, bouton principal noir */
 .secondary-btn { 
     background: var(--bg-light); 
     color: var(--text-dark); 
@@ -77,17 +77,18 @@ button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.2
 }
 .google-btn { background: white; color: var(--text-dark); border: 1px solid #E0E0E0; }
 
-.auth-buttons { display: flex; gap: 10px; } /* Les boutons login/signup côte à côte */
+.auth-buttons { display: flex; gap: 10px; } 
 .auth-buttons button { flex: 1; margin-top: 15px; }
 
 .separator { margin: 25px 0; color: var(--secondary); font-size: 14px; text-align: center;}
 .small-link { color: var(--link-color); font-size: 12px; margin-top: 15px; cursor: pointer; text-align: center;}
+.error-message { color: red; font-size: 12px; display: block; margin-top: -10px; text-align: left; margin-bottom: 5px;}
 
 /* Cartes (Fidélité & RDV) */
 .status-card {
     background: white; padding: 25px; border-radius: 10px;
     margin-bottom: 20px; border: 1px solid #E0E0E0;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08); 
+    box-shadow: none; /* Pas d'ombre */
     text-align: center;
 }
 #appointment-card-profile { border: 1px solid var(--primary); }
@@ -111,7 +112,7 @@ button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.2
     display: flex; justify-content: space-around;
     align-items: center; border-top: 1px solid #E0E0E0; 
     z-index: 1000;
-    box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 -1px 5px rgba(0,0,0,0.05); /* Ombre très légère */
     padding: 0 5px;
 }
 
@@ -120,13 +121,7 @@ button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.2
 .nav-icon { font-size: 24px; display: block; margin-bottom: 2px; }
 
 /* Iframe Setmore */
-iframe { 
-    width: 100%; 
-    height: 100%; 
-    border: none; 
-    background: white; 
-    border-radius: 8px; 
-}
+iframe { width: 100%; height: 100%; border: none; background: white; border-radius: 8px; }
 
 /* HISTORIQUE CLIENT */
 #visit-history-client { margin-top: 20px; }
@@ -143,9 +138,9 @@ iframe {
 }
 .history-item-client span { color: var(--secondary); font-size: 12px; }
 
-/* Admin Styles (à conserver) */
+/* Admin Styles (Ajustement pour le nouveau thème) */
 #admin-main { padding-bottom: 90px; }
-.user-card { background: #252525; padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 3px solid var(--primary); cursor: pointer; }
+.user-card { background: var(--bg-dark); padding: 15px; margin-bottom: 10px; border-radius: 5px; border-left: 3px solid var(--primary); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
 .badge { background: var(--primary); color: var(--bg-dark); padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 12px; }
 .modal { background: rgba(0,0,0,0.85); }
 .modal-content { background: var(--bg-dark); padding: 30px; border-radius: 10px; border: 2px solid var(--primary); }
