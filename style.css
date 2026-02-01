@@ -1,12 +1,11 @@
 /* Import des Polices Replit */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 
-/* Charte Graphique Replit */
+/* Couleurs Replit */
 :root {
-    --primary: hsl(45 93% 47%);       /* Or/Ambre (Accent) */
+    --primary: hsl(45 93% 47%);       /* Or/Ambre */
     --primary-text: hsl(222 47% 11%); /* Texte sur l'accent */
-    --bg-dark: hsl(222 47% 11%);      /* Fond très sombre (Slate 950) */
-    --bg-light: hsl(210 40% 98%);     /* Presque Blanc (Foreground) */
+    --bg-dark: hsl(222 47% 11%);      /* Fond très sombre */
     --card: hsl(217 33% 17%);         /* Gris-Bleu foncé (Card) */
     --text-color: hsl(210 40% 98%);   /* Blanc cassé */
     --border-color: hsl(217 33% 20%); /* Bordure sombre */
@@ -34,10 +33,13 @@ body {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 0 20px rgba(0,0,0,0.3); 
 }
 
-header h1 {
+.content-padding { padding: 20px; }
+
+/* Header/Titles */
+header { border-bottom: 1px solid var(--border-color); }
+.header-title {
     font-family: var(--font-display);
     color: var(--text-color);
     text-align: center;
@@ -45,56 +47,17 @@ header h1 {
     padding: 25px 0 15px;
     margin: 0;
     font-size: 30px;
-    border-bottom: 1px solid var(--border-color);
+}
+.section-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    margin-bottom: 25px;
+    text-align: center;
+    color: var(--text-color); /* Couleur par défaut */
 }
 
-/* Général */
-section { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-.tab-content { padding-bottom: 90px; height: calc(100vh - 160px); overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; }
-#tab-booking { padding: 0; height: calc(100vh - 75px); }
-
-/* Formulaires & Boutons */
-input {
-    width: 100%; padding: 15px; margin: 12px 0;
-    background: var(--card); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-}
-input:focus { border-color: var(--primary); outline: none; }
-
-button {
-    width: 100%; padding: 15px; border: none; border-radius: 5px;
-    font-weight: 600; /* Plus de Bold */
-    cursor: pointer; margin-top: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    transition: all 0.2s;
-}
-
-.primary-btn { background: var(--primary); color: var(--primary-text); }
-.secondary-btn { 
-    background: var(--card); 
-    color: var(--text-color); 
-    border: 1px solid var(--border-color);
-}
-.google-btn {
-    background: var(--card); 
-    color: var(--text-color); 
-    border: 1px solid var(--border-color);
-}
-
-.separator { margin: 25px 0; color: var(--text-color); font-size: 14px; }
-.small-link { color: var(--primary); font-size: 12px; margin-top: 15px; cursor: pointer; }
-
-/* Cartes (Fidélité & RDV) */
-.status-card, .profile-box {
-    background: var(--card); 
-    padding: 25px; 
-    border-radius: 8px;
-    margin-bottom: 20px; 
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.5); 
-}
-
-.gold-text { /* Nouvelle classe pour le look Or/Ambre */
+/* Gold Gradient Effect */
+.gold-text {
     background: linear-gradient(135deg, var(--primary) 0%, hsl(35 90% 60%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -102,27 +65,52 @@ button {
     color: transparent;
 }
 
-.label-gold { 
-    color: var(--primary); /* Utilisé pour les étiquettes */
-    font-weight: 500; 
+/* Formulaires & Boutons */
+input {
+    width: 100%; padding: 15px; margin: 10px 0;
+    background: var(--card); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 5px;
+    font-size: 16px;
+}
+input:focus { border-color: var(--primary); outline: none; }
+
+.btn {
+    padding: 15px; border: none; border-radius: 5px;
+    font-weight: 600; margin-top: 10px; cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+.primary-btn { background: var(--primary); color: var(--primary-text); }
+.secondary-btn { background: var(--card); color: var(--text-color); border: 1px solid var(--border-color); }
+.google-btn { background: var(--card); color: var(--text-color); border: 1px solid var(--border-color); }
+.separator { margin: 20px 0; color: var(--border-color); font-size: 14px; }
+.small-link { color: var(--primary); font-size: 14px; text-align: center; margin-top: 15px; cursor: pointer; }
+
+/* Cartes Premium */
+.loyalty-card, .qr-panel, .appointment-card, .profile-info-box {
+    background: var(--card); 
+    padding: 25px; 
+    border-radius: 8px;
+    margin-bottom: 20px; 
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3); 
 }
 
-#points-display { 
-    font-family: var(--font-display); 
-    font-size: 56px; 
-    font-weight: 700; 
-    margin: 10px 0; 
-}
+.card-tag { font-size: 10px; font-weight: 600; color: var(--primary); letter-spacing: 1px; }
+.card-title { font-family: var(--font-display); font-size: 24px; margin: 5px 0 15px; }
+
+.points-label, .qr-instruction, .profile-label { color: hsl(215 20% 65%); font-size: 12px; text-transform: uppercase; margin: 0 0 5px; }
+.points-number { font-family: var(--font-display); font-size: 56px; font-weight: 700; margin: 0; }
 
 /* Barre de progression */
-.progress-container { background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 10px; }
-#progress-bar { background: var(--primary); height: 100%; width: 0%; transition: width 0.5s ease-in-out; }
+.progress-bar-container { background: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin-top: 10px; }
+.progress-bar-fill { background: var(--primary); height: 100%; width: 0%; transition: width 0.5s ease-in-out; }
+
+.gift-message { color: var(--primary); text-align: center; font-weight: 600; margin-top: 15px; }
 
 /* QR Code */
-.qr-section { text-align: center; margin-top: 30px; }
-.qr-container { background: var(--bg-light); padding: 20px; display: inline-block; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+.qr-panel { text-align: center; }
+.qr-code-wrapper { background: var(--bg-light); padding: 15px; display: inline-block; border-radius: 5px; margin-top: 10px; }
 
-/* Navigation basse */
+/* Navigation Basse */
 .bottom-nav {
     position: fixed; bottom: 0; width: 100%; max-width: 450px; height: 75px;
     background: var(--card); 
@@ -131,14 +119,16 @@ button {
     box-shadow: 0 -4px 10px rgba(0,0,0,0.5);
     z-index: 1000;
 }
-.nav-item { color: hsl(215 20% 65%); /* Muted foreground */ }
+.nav-item { color: hsl(215 20% 65%); flex: 1; text-align: center; padding-top: 5px; cursor: pointer; }
 .nav-item.active { color: var(--primary); }
+.nav-icon { font-size: 24px; display: block; margin-bottom: 2px; }
 
 /* Historique */
+.history-list { margin-top: 15px; }
 .history-item-client {
     background: var(--card);
-    padding: 10px 15px;
-    margin-bottom: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
     border-radius: 5px;
     border-left: 3px solid var(--primary);
     font-size: 14px;
@@ -146,7 +136,15 @@ button {
     justify-content: space-between;
     align-items: center;
 }
-.history-item-client span { color: var(--text-color); font-size: 12px; }
+.history-item-client span { color: var(--text-color); font-size: 14px; }
 
-/* Admin Styles (maintenus) */
-.modal-content { border: 2px solid var(--primary); }
+/* Profil */
+.profile-info-box { text-align: center; padding: 30px; }
+.profile-email { font-size: 20px; margin-top: 5px; }
+.lang-settings { margin-top: 25px; }
+.lang-label { color: var(--text-color); font-size: 14px; text-align: center; margin-bottom: 10px; }
+.lang-dropdown { 
+    width: 100%; padding: 10px; background: var(--card); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 5px; 
+    font-family: var(--font-body);
+}
+.logout-btn { background: hsl(217 33% 17%); margin-top: 30px; }

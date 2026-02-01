@@ -10,13 +10,13 @@ const firebaseConfig = {
     messagingSenderId: "645134286018",
     appId: "1:645134286018:web:5bf96b80d24393a2bd8f5b"
 };
-const SETMORE_REFRESH_TOKEN = "r1/2557ad16dcZ1aOBR0sCas6W2Z7MtRXgk25KLBL9cDIMW7"; // Inutilisé, mais gardé
+const SETMORE_REFRESH_TOKEN = "r1/2557ad16dcZ1aOBR0sCas6W2Z7MtRXgk25KLBL9cDIMW7"; // Gardé pour l'exemple
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// --- 1. LANGUES COMPLÈTES ---
+// --- 1. LANGUES COMPLÈTES (Pas de changement) ---
 const langData = {
     fr: { 
         title: "Connexion", google: "Continuer avec Google", loyalty: "Ma Fidélité", 
@@ -53,12 +53,12 @@ function updateLanguage(lang) {
 
     const safeSetText = (id, text) => { const el = document.getElementById(id); if (el) el.innerText = text; };
     const safeSetPlaceholder = (id, text) => { const el = document.getElementById(id); if (el) el.placeholder = text; };
+    const safeSetDataText = (id, text) => { const el = document.getElementById(id); if (el) el.dataset.text = text; }; // Pour les boutons
 
     // Traduction des textes
     safeSetText('txt-title', t.title);
     safeSetText('txt-google', t.google);
     safeSetText('txt-loyalty', t.loyalty);
-    safeSetText('txt-logout', t.logout);
     safeSetText('btn-logout', t.logout);
     safeSetText('txt-show-qr', t.qr);
     safeSetText('txt-profile-title', t.profileTitle);
@@ -68,11 +68,14 @@ function updateLanguage(lang) {
     safeSetText('nav-profile', t.navProfile);
     safeSetText('nav-history', t.navHistory);
     safeSetText('history-title', t.historyTitle);
-    safeSetText('btn-login', t.login);
-    safeSetText('btn-signup', t.signup);
     safeSetText('toggle-signup', t.signupToggle);
+    
+    // Traduction des boutons via data-text
+    safeSetDataText('btn-login', t.login);
+    safeSetDataText('btn-signup', t.signup);
+    safeSetDataText('btn-logout', t.logout);
 
-    // Traduction des placeholders (CORRIGÉ !)
+    // Traduction des placeholders
     safeSetPlaceholder('email', t.phEmail);
     safeSetPlaceholder('password', t.phPassword);
     safeSetPlaceholder('username', t.phUsername);
@@ -86,9 +89,7 @@ function updateLanguage(lang) {
 // --- 2. LOGIQUE SETMORE (Désactivé) ---
 async function updateAppointmentUI(email) {
     const cardHome = document.getElementById('appointment-card');
-    const cardProfile = document.getElementById('appointment-card-profile');
     if (cardHome) cardHome.style.display = 'none';
-    if (cardProfile) cardProfile.style.display = 'none';
 }
 
 // --- 3. INITIALISATION & LOGIQUE INSCRIPTION ---
@@ -109,39 +110,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if(toggleLink) toggleLink.onclick = () => {
         isSigningUp = !isSigningUp;
+        const currentLang = localStorage.getItem('userLang') || 'fr';
         if(isSigningUp) {
-            usernameInput.style.display = 'block';
-            toggleLink.innerText = langData[localStorage.getItem('userLang') || 'fr'].login;
-            document.getElementById('btn-login').style.display = 'none';
-            document.getElementById('btn-signup').style.display = 'block';
+            usernameInput.classList.remove('hidden-input'); // Rendre visible
+            toggleLink.innerText = langData[currentLang].login;
+            document.getElementById('btn-login').classList.add('hidden-input');
+            document.getElementById('btn-signup').classList.remove('hidden-input');
         } else {
-            usernameInput.style.display = 'none';
-            toggleLink.innerText = langData[localStorage.getItem('userLang') || 'fr'].signupToggle;
-            document.getElementById('btn-login').style.display = 'block';
-            document.getElementById('btn-signup').style.display = 'none';
+            usernameInput.classList.add('hidden-input'); // Rendre invisible
+            toggleLink.innerText = langData[currentLang].signupToggle;
+            document.getElementById('btn-login').classList.remove('hidden-input');
+            document.getElementById('btn-signup').classList.add('hidden-input');
         }
     };
     
-    // Au démarrage, on affiche le Login par défaut
-    if(usernameInput) usernameInput.style.display = 'none';
-    if(document.getElementById('btn-signup')) document.getElementById('btn-signup').style.display = 'none';
-}); // ... dans onAuthStateChanged (vers la ligne 128)
-// Affichage du nom si disponible
-const displayName = user.displayName || user.email.split('@')[0];
-const userEmailDisplay = document.getElementById('user-email-display');
-userEmailDisplay.innerText = displayName;
-userEmailDisplay.classList.add('gold-text'); // AJOUT DE LA CLASSE GOLD
-// ... (le reste du code)
+    // Au démarrage, on cache le champ username et le bouton inscription
+    if(usernameInput) usernameInput.classList.add('hidden-input');
+    if(document.getElementById('btn-signup')) document.getElementById('btn-signup').classList.add('hidden-input');
+});
 
-// --- 4. A UTH & TEMPS RÉEL ---
+// --- 4. AUTH & TEMPS RÉEL ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         document.getElementById('login-section').style.display = 'none';
-        document.getElementById('client-section').style.display = 'block';
+        document.getElementById('client-section').style.display = 'flex'; // Utiliser flex pour l'alignement
         
         // Affichage du nom si disponible
         const displayName = user.displayName || user.email.split('@')[0];
-        document.getElementById('user-email-display').innerText = displayName;
+        const userEmailDisplay = document.getElementById('user-email-display');
+        userEmailDisplay.innerText = displayName;
+        userEmailDisplay.classList.add('gold-text'); // Ajout du style Gold
 
         // Masquer le RDV
         updateAppointmentUI(user.email);
@@ -153,23 +151,23 @@ onAuthStateChanged(auth, async (user) => {
                 const currentLang = localStorage.getItem('userLang') || 'fr';
                 
                 // Points
-                // ... dans onAuthStateChanged > onSnapshot (vers la ligne 153)
-// Points
-document.getElementById('points-display').innerText = `${data.points} / 5`;
-document.getElementById('points-display').classList.add('gold-text'); // AJOUT DE LA CLASSE GOLD
-document.getElementById('progress-bar').style.width = (data.points / 5 * 100) + "%";
-// ... (le reste du code)
+                // Mise à jour de l'ID pour le nouveau design
+                document.getElementById('points-display').innerText = `${data.points} / 5`;
+                document.getElementById('points-display').classList.add('gold-text'); // Ajout du style Gold
+                document.getElementById('progress-bar').style.width = (data.points / 5 * 100) + "%";
+                document.getElementById('gift-msg').style.display = data.points >= 5 ? 'block' : 'none';
+                document.getElementById('gift-msg').innerText = langData[currentLang].gift;
 
                 // QR Code
                 document.getElementById('qrcode').innerHTML = "";
-                new QRCode(document.getElementById('qrcode'), { text: user.uid, width: 140, height: 140 });
+                new QRCode(document.getElementById('qrcode'), { text: user.uid, width: 140, height: 140, colorDark: '#1A1A1A' }); // Couleur QR code
 
                 // HISTORIQUE CLIENT
                 const histDiv = document.getElementById('visit-history-client');
                 const history = data.history || [];
                 if (histDiv) {
                     if (history.length === 0) {
-                        histDiv.innerHTML = `<p style="text-align:center; color: var(--gray-text);">${langData[currentLang].noHistory}</p>`;
+                        histDiv.innerHTML = `<p style="text-align:center; color: hsl(215 20% 65%);">${langData[currentLang].noHistory}</p>`;
                     } else {
                         histDiv.innerHTML = history.reverse().map(date => 
                             `<div class="history-item-client"><span>Visite du</span>${date}</div>`
@@ -204,11 +202,9 @@ document.getElementById('btn-signup').onclick = () => {
     
     createUserWithEmailAndPassword(auth, e, p)
         .then(res => {
-            // AJOUT DU PSEUDO DANS LE PROFIL FIREBASE
             return updateProfile(res.user, { displayName: username });
         })
-        .then(res => {
-            // CRÉATION DU DOCUMENT FIREBASE
+        .then(() => {
             setDoc(doc(db, "users", auth.currentUser.uid), { 
                 email: auth.currentUser.email, 
                 displayName: username,
