@@ -58,7 +58,7 @@ section { padding: 0; flex-grow: 1; display: flex; flex-direction: column; overf
 }
 #tab-booking { padding: 0; height: calc(100vh - 100px); overflow-y: hidden; } /* Ajusté pour l'iframe */
 
-/* 3. Formulaires & Boutons - Reste le même ... */
+/* 3. Formulaires & Boutons */
 input {
     width: 100%; padding: 15px; margin: 12px 0;
     background: var(--bg-light); border: 1px solid var(--accent); color: var(--text-dark); border-radius: 5px;
@@ -123,7 +123,7 @@ button:active { opacity: 0.8; }
     padding: 0 5px;
 }
 
-.nav-item { text-align: center; color: var(--secondary); font-size: 10px; cursor: pointer; flex: 1; padding-top: 5px; transition: color 0.2s;}
+.nav-item { text-align: center; color: var(--secondary); font-size: 10px; cursor: pointer; flex: 1; padding-top: 5px; transition: color 0.3s ease;}
 .nav-item.active { color: var(--primary); font-weight: bold; }
 .nav-icon { font-size: 24px; display: block; margin-bottom: 2px; }
 
@@ -134,10 +134,14 @@ iframe {
     border: none; 
     background: white; 
     border-radius: 8px; 
-    padding-bottom: 80px; /* Pousse le contenu vers le haut de 80px pour éviter le chevauchement */
+    padding-bottom: 80px; /* Pousse le contenu vers le haut de 80px */
     box-sizing: content-box; 
 }
-
+#tab-booking {
+    padding: 0; 
+    height: calc(100vh - 100px); /* Hauteur ajustée */
+    overflow-y: hidden; 
+}
 
 /* 6. HISTORIQUE CLIENT */
 #visit-history-client { margin-top: 20px; }

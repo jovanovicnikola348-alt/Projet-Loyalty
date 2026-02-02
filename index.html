@@ -26,13 +26,13 @@
 
             <h2 id="txt-title">Connexion</h2>
             <input type="email" id="email" placeholder="Email">
-            <span id="email-error" class="error-message"></span> <!-- Conteneur d'erreur Email -->
+            <span id="email-error" class="error-message"></span>
             
             <input type="text" id="username" placeholder="Nom/Pseudo" style="display:none;">
-            <span id="username-error" class="error-message"></span> <!-- Conteneur d'erreur Pseudo -->
+            <span id="username-error" class="error-message"></span>
             
             <input type="password" id="password" placeholder="Mot de passe">
-            <span id="password-error" class="error-message"></span> <!-- Conteneur d'erreur Mot de passe -->
+            <span id="password-error" class="error-message"></span>
             
             <div class="auth-buttons">
                 <button id="btn-login" class="primary-btn">Se connecter</button>
@@ -138,11 +138,30 @@
 
     <script>
         function showTab(tabName, element) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
-            document.getElementById('tab-' + tabName).style.display = 'flex';
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            const allTabs = document.querySelectorAll('.tab-content');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            // 1. Masquer les anciens onglets en douceur (Opacité)
+            allTabs.forEach(tab => {
+                tab.style.opacity = '0';
+                tab.style.transition = 'opacity 0.2s ease-in-out';
+                setTimeout(() => {
+                    tab.style.display = 'none';
+                }, 200);
+            });
+
+            // 2. Afficher le nouvel onglet et le rendre visible
+            const newTab = document.getElementById('tab-' + tabName);
+            newTab.style.display = 'flex';
+            setTimeout(() => {
+                newTab.style.opacity = '1';
+            }, 100); 
+
+            // 3. Gérer l'état actif du menu
+            navItems.forEach(item => item.classList.remove('active'));
             element.classList.add('active');
 
+            // 4. Rafraîchir les données si on revient de l'Iframe
             if (tabName === 'home' || tabName === 'profile') {
                 window.dispatchEvent(new Event('refreshAppointments'));
             }
