@@ -18,8 +18,8 @@
         <section id="login-section">
             <div class="lang-wrapper">
                 <select id="lang-select" class="lang-dropdown">
-                    <option value="fr">🇫🇷 FR</option>
                     <option value="sr">🇷🇸 SR</option>
+                    <option value="fr">🇫🇷 FR</option>
                     <option value="en">🇬🇧 EN</option>
                 </select>
             </div>
@@ -86,19 +86,24 @@
             </div>
 
             <div id="tab-profile" class="tab-content">
-                <h2 id="txt-profile-title" style="color: var(--primary);">Mon Profil</h2>
-                <div class="profile-box">
-                    <p id="user-email-display"></p>
+                <h2 id="txt-profile-title" style="color: var(--primary);">Moj Profil</h2>
+                <div class="profile-settings">
+                    <h3 id="txt-settings-title" class="profile-section-title">Podešavanja naloga</h3>
+                    <label id="txt-display-name-label" class="profile-label">Prikazano ime</label>
+                    <input type="text" id="profile-display-name" class="profile-input" placeholder="">
+                    <label id="txt-email-label" class="profile-label">Email</label>
+                    <p id="user-email-display" class="profile-email-readonly"></p>
+                    <button type="button" id="btn-save-profile" class="primary-btn profile-save-btn">Sačuvaj</button>
                 </div>
                 <div class="lang-settings">
-                    <label id="txt-lang-label">Changer la langue :</label>
+                    <label id="txt-lang-label">Promeni jezik :</label>
                     <select id="lang-select-profile" class="lang-dropdown" style="width: 100%; margin-top: 10px;">
-                        <option value="fr">🇫🇷 Français</option>
                         <option value="sr">🇷🇸 Srpski</option>
+                        <option value="fr">🇫🇷 Français</option>
                         <option value="en">🇬🇧 English</option>
                     </select>
                 </div>
-                <button id="btn-logout" class="secondary-btn" style="margin-top: 30px;">Déconnexion</button>
+                <button id="btn-logout" class="secondary-btn btn-logout">Odjavi se</button>
             </div>
 
             <nav class="bottom-nav">

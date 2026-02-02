@@ -17,46 +17,37 @@
         </header>
 
         <!-- Vue Liste & Recherche -->
-        <section id="admin-main">
-            <button id="open-scanner" style="margin-bottom: 20px;">📷 Ouvrir le Scanner</button>
-            
-            <div class="search-bar">
-                <input type="text" id="user-search" placeholder="Rechercher un client (email)...">
+        <section id="admin-main" class="admin-section">
+            <button id="open-scanner" class="admin-btn admin-btn-primary">📷 <span id="open-scanner-text">Otvori skener</span></button>
+            <div class="admin-search-wrap">
+                <input type="text" id="user-search" class="admin-search-input" placeholder="">
             </div>
-
-            <div id="user-list">
-                <p>Chargement des clients...</p>
+            <div id="user-list" class="admin-user-list">
+                <p class="admin-loading">Učitavanje klijenata...</p>
             </div>
         </section>
 
-        <!-- Vue Scanner (Cachée par défaut) -->
-        <section id="scanner-view" style="display:none;">
-            <div id="reader"></div>
-            <button id="close-scanner" style="background: #666;">Retour à la liste</button>
+        <!-- Vue Scanner -->
+        <section id="scanner-view" class="admin-section scanner-section" style="display:none;">
+            <div id="reader" class="scanner-reader"></div>
+            <button id="close-scanner" class="admin-btn admin-btn-secondary">← <span id="close-scanner-text">Nazad na listu</span></button>
         </section>
 
-        <!-- Fenêtre Détails Client (Modal) -->
+        <!-- Modal Détails Client -->
         <div id="user-modal" class="modal" style="display:none;">
-            <div class="modal-content">
-                <h2 id="modal-email" style="color:var(--gold)"></h2>
+            <div class="modal-content admin-modal-content">
+                <h2 id="modal-email" class="modal-email-title"></h2>
                 <div class="point-controls">
-                    <button class="btn-min" id="remove-point">-</button>
-                    <span id="modal-points">0</span>
-                    <button class="btn-plus" id="add-point">+</button>
+                    <button type="button" class="btn-min" id="remove-point">−</button>
+                    <span id="modal-points" class="modal-points-value">0</span>
+                    <button type="button" class="btn-plus" id="add-point">+</button>
                 </div>
-                
-                <!-- AJOUTS : Boutons de gestion -->
-                <button id="use-reward" style="background-color: #e67e22; margin-top: 10px;">🎁 Utiliser la récompense (Reset à 0)</button>
-
-                <hr style="margin-top: 20px; border-color: #333;">
-                
-                <h3>Historique des visites</h3>
-                <div id="visit-history"></div>
-
-                <!-- AJOUT : Bouton de suppression -->
-                <button id="delete-user-btn" style="background-color: #c0392b; margin-top: 30px;">Supprimer l'utilisateur</button>
-
-                <button id="close-modal" style="margin-top:20px; background-color: #444;">Fermer</button>
+                <button type="button" id="use-reward" class="admin-btn admin-btn-reward">🎁 <span id="use-reward-text">Iskoristi nagradu (Reset na 0)</span></button>
+                <hr class="modal-divider">
+                <h3 id="modal-history-title" class="modal-section-title">Istorija poseta</h3>
+                <div id="visit-history" class="modal-history-list"></div>
+                <button type="button" id="delete-user-btn" class="admin-btn admin-btn-danger">🗑 <span id="delete-user-text">Obriši korisnika</span></button>
+                <button type="button" id="close-modal" class="admin-btn admin-btn-close">Zatvori</button>
             </div>
         </div>
     </div>

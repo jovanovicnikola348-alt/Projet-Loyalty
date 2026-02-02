@@ -16,9 +16,9 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const langData = {
-    fr: { title: "Connexion", google: "Continuer avec Google", loyalty: "Ma Fidélité", gift: "🎁 Coupe offerte !", logout: "Déconnexion", qr: "Présentez ce code au salon :", next: "Prochain RDV", navHome: "Accueil", navBooking: "Rendez-vous", navProfile: "Profil", navHistory: "Visites", profileTitle: "Mon Profil", langLabel: "Changer la langue :", phEmail: "Email", phPassword: "Mot de passe", phUsername: "Nom/Pseudo", login: "Se connecter", signup: "Inscription", signupToggle: "Vous n'avez pas de compte ? S'inscrire", historyTitle: "Historique des visites", noHistory: "Aucune visite enregistrée.", emailInvalid: "L'adresse email n'est pas valide.", emailUsed: "Cet email est déjà utilisé.", passTooWeak: "Mot de passe trop faible (min 6)", visitOn: "Visite du" },
-    sr: { title: "Prijava", google: "Nastavi sa Google-om", loyalty: "Moja lojalnost", gift: "🎁 Besplatno šišanje !", logout: "Odjavi se", qr: "Pokažite ovaj kod u salonu :", next: "Sledeći termin", navHome: "Početna", navBooking: "Termini", navProfile: "Profil", navHistory: "Posete", profileTitle: "Moj Profil", langLabel: "Promeni jezik :", phEmail: "Email", phPassword: "Lozinka", phUsername: "Ime/Nadimak", login: "Prijavi se", signup: "Registracija", signupToggle: "Nemate nalog? Registracija", historyTitle: "Istorija poseta", noHistory: "Nema zabeleženih poseta.", emailInvalid: "Neispravna adresa e-pošte.", emailUsed: "Ovaj e-mail je već u upotrebi.", passTooWeak: "Lozinka je preslaba (min 6)", visitOn: "Poseta dana" },
-    en: { title: "Login", google: "Continue with Google", loyalty: "My Loyalty", gift: "🎁 Free Haircut !", logout: "Logout", qr: "Show this code at the salon:", next: "Next Appointment", navHome: "Home", navBooking: "Booking", navProfile: "Profile", navHistory: "History", profileTitle: "My Profile", langLabel: "Change Language :", phEmail: "Email", phPassword: "Password", phUsername: "Name/Nickname", login: "Login", signup: "Signup", signupToggle: "Don't have an account? Sign up", historyTitle: "Visit History", noHistory: "No recorded visits.", emailInvalid: "Invalid email address.", emailUsed: "This email is already in use.", passTooWeak: "Password too weak (min 6)", visitOn: "Visit on" }
+    fr: { title: "Connexion", google: "Continuer avec Google", loyalty: "Ma Fidélité", gift: "🎁 Coupe offerte !", logout: "Déconnexion", qr: "Présentez ce code au salon :", next: "Prochain RDV", navHome: "Accueil", navBooking: "Rendez-vous", navProfile: "Profil", navHistory: "Visites", profileTitle: "Mon Profil", langLabel: "Changer la langue :", phEmail: "Email", phPassword: "Mot de passe", phUsername: "Nom/Pseudo", login: "Se connecter", signup: "Inscription", signupToggle: "Vous n'avez pas de compte ? S'inscrire", historyTitle: "Historique des visites", noHistory: "Aucune visite enregistrée.", emailInvalid: "L'adresse email n'est pas valide.", emailUsed: "Cet email est déjà utilisé.", passTooWeak: "Mot de passe trop faible (min 6)", visitOn: "Visite du", settingsTitle: "Paramètres du compte", displayNameLabel: "Nom affiché", emailLabel: "Email", saveProfile: "Enregistrer", profileUpdated: "Profil mis à jour.", nameRequired: "Le nom est requis." },
+    sr: { title: "Prijava", google: "Nastavi sa Google-om", loyalty: "Moja lojalnost", gift: "🎁 Besplatno šišanje !", logout: "Odjavi se", qr: "Pokažite ovaj kod u salonu :", next: "Sledeći termin", navHome: "Početna", navBooking: "Termini", navProfile: "Profil", navHistory: "Posete", profileTitle: "Moj Profil", langLabel: "Promeni jezik :", phEmail: "Email", phPassword: "Lozinka", phUsername: "Ime/Nadimak", login: "Prijavi se", signup: "Registracija", signupToggle: "Nemate nalog? Registracija", historyTitle: "Istorija poseta", noHistory: "Nema zabeleženih poseta.", emailInvalid: "Neispravna adresa e-pošte.", emailUsed: "Ovaj e-mail je već u upotrebi.", passTooWeak: "Lozinka je preslaba (min 6)", visitOn: "Poseta dana", settingsTitle: "Podešavanja naloga", displayNameLabel: "Prikazano ime", emailLabel: "Email", saveProfile: "Sačuvaj", profileUpdated: "Profil ažuriran.", nameRequired: "Ime je obavezno." },
+    en: { title: "Login", google: "Continue with Google", loyalty: "My Loyalty", gift: "🎁 Free Haircut !", logout: "Logout", qr: "Show this code at the salon:", next: "Next Appointment", navHome: "Home", navBooking: "Booking", navProfile: "Profile", navHistory: "History", profileTitle: "My Profile", langLabel: "Change Language :", phEmail: "Email", phPassword: "Password", phUsername: "Name/Nickname", login: "Login", signup: "Signup", signupToggle: "Don't have an account? Sign up", historyTitle: "Visit History", noHistory: "No recorded visits.", emailInvalid: "Invalid email address.", emailUsed: "This email is already in use.", passTooWeak: "Password too weak (min 6)", visitOn: "Visit on", settingsTitle: "Account settings", displayNameLabel: "Display name", emailLabel: "Email", saveProfile: "Save", profileUpdated: "Profile updated.", nameRequired: "Name is required." }
 };
 
 function updateLanguage(lang) {
@@ -33,6 +33,10 @@ function updateLanguage(lang) {
     safeSetText('nav-booking', t.navBooking); safeSetText('nav-profile', t.navProfile);
     safeSetText('nav-history', t.navHistory); safeSetText('history-title', t.historyTitle);
     safeSetText('txt-next-apt', t.next);
+    if (t.settingsTitle) safeSetText('txt-settings-title', t.settingsTitle);
+    if (t.displayNameLabel) safeSetText('txt-display-name-label', t.displayNameLabel);
+    if (t.emailLabel) safeSetText('txt-email-label', t.emailLabel);
+    if (t.saveProfile) { const sp = document.getElementById('btn-save-profile'); if (sp) sp.innerText = t.saveProfile; }
     safeSetPlaceholder('email', t.phEmail); safeSetPlaceholder('password', t.phPassword); safeSetPlaceholder('username', t.phUsername);
 
     document.getElementById('btn-login').innerText = t.login;
@@ -53,12 +57,17 @@ onAuthStateChanged(auth, async (user) => {
         homeTab.style.opacity = '1'; 
         
         const displayName = user.displayName || user.email.split('@')[0];
-        document.getElementById('user-email-display').innerText = displayName;
+        const profileNameInput = document.getElementById('profile-display-name');
+        const emailDisplay = document.getElementById('user-email-display');
+        if (profileNameInput) profileNameInput.value = displayName;
+        if (emailDisplay) emailDisplay.innerText = user.email || '';
 
         onSnapshot(doc(db, "users", user.uid), (snap) => {
             if (snap.exists()) {
                 const data = snap.data();
-                const currentLang = localStorage.getItem('userLang') || 'fr';
+                const currentLang = localStorage.getItem('userLang') || 'sr';
+                if (document.getElementById('profile-display-name') && data.displayName !== undefined)
+                    document.getElementById('profile-display-name').value = data.displayName;
                 
                 document.getElementById('points-display').innerText = `${data.points} / 5`;
                 if(document.getElementById('progress-bar')) document.getElementById('progress-bar').style.width = (data.points / 5 * 100) + "%";
@@ -90,7 +99,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const savedLang = localStorage.getItem('userLang') || (navigator.language.startsWith('sr') ? 'sr' : 'fr');
+    const savedLang = localStorage.getItem('userLang') || 'sr';
     updateLanguage(savedLang);
 
     const lSelect = document.getElementById('lang-select');
@@ -109,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if(toggleLink) toggleLink.onclick = () => {
         isSigningUp = !isSigningUp;
-        const currentLang = localStorage.getItem('userLang') || 'fr';
+        const currentLang = localStorage.getItem('userLang') || 'sr';
         if(isSigningUp) {
             usernameInput.style.display = 'block';
             btnLogin.style.display = 'none';
@@ -142,7 +151,7 @@ document.getElementById('btn-signup').onclick = () => {
     createUserWithEmailAndPassword(auth, e, p).then(res => updateProfile(res.user, { displayName: username })).then(() => {
         setDoc(doc(db, "users", auth.currentUser.uid), { email: auth.currentUser.email, displayName: username, points: 0, history: [] });
     }).catch(error => {
-        const currentLang = localStorage.getItem('userLang') || 'fr';
+        const currentLang = localStorage.getItem('userLang') || 'sr';
         const emailErr = document.getElementById('email-error');
         const passErr = document.getElementById('password-error');
         if(emailErr) emailErr.style.display = 'none'; 
@@ -153,3 +162,23 @@ document.getElementById('btn-signup').onclick = () => {
     });
 };
 document.getElementById('btn-logout').onclick = () => signOut(auth);
+
+document.getElementById('btn-save-profile').onclick = async () => {
+    const input = document.getElementById('profile-display-name');
+    const name = (input && input.value) ? input.value.trim() : '';
+    const currentLang = localStorage.getItem('userLang') || 'sr';
+    if (!name) {
+        alert(langData[currentLang].nameRequired);
+        return;
+    }
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+        await updateProfile(user, { displayName: name });
+        await updateDoc(doc(db, "users", user.uid), { displayName: name });
+        alert(langData[currentLang].profileUpdated);
+    } catch (err) {
+        console.error(err);
+        alert(err.message || 'Erreur');
+    }
+};
