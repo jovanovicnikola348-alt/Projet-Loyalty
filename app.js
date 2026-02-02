@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyC0TZI_OpGJ5_-zlDY08KmYx4K9aodJRsU",
@@ -123,9 +123,16 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 });
 
-document.getElementById('btn-google').onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).then(res => {
-    setDoc(doc(db, "users", res.user.uid), { email: res.user.email, displayName: res.user.displayName, points: 0, history: [] }, { merge: true });
-});
+document.getElementById('btn-google').onclick = async () => {
+    const res = await signInWithPopup(auth, new GoogleAuthProvider());
+    const userRef = doc(db, "users", res.user.uid);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) {
+        setDoc(userRef, { email: res.user.email, displayName: res.user.displayName, points: 0, history: [] });
+    } else {
+        updateDoc(userRef, { email: res.user.email, displayName: res.user.displayName });
+    }
+};
 document.getElementById('btn-login').onclick = () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value);
 document.getElementById('btn-signup').onclick = () => {
     const e = document.getElementById('email').value;

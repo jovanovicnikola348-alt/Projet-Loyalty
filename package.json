@@ -1,0 +1,7 @@
+{
+  "name": "projet-loyalty",
+  "private": true,
+  "scripts": {
+    "preview": "npx --yes serve -p 8080 -o"
+  }
+}
