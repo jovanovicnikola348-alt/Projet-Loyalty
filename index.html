@@ -137,39 +137,13 @@
     <script type="module" src="app.js"></script>
 
     <script>
-        // FONCTION SHOWTAB AVEC TRANSITION D'OPACITÉ SMOOTH
+        // FONCTION SHOWTAB CORRIGÉE POUR LA STABILITÉ (PAS DE TRANSITION D'OPACITÉ)
         function showTab(tabName, element) {
-            const allTabs = document.querySelectorAll('.tab-content');
-            const navItems = document.querySelectorAll('.nav-item');
-
-            // 1. Transition de sortie : Masquer l'onglet actif en douceur (200ms)
-            const currentActiveTab = document.querySelector('.tab-content:not([style*="display: none"])');
-            if (currentActiveTab) {
-                currentActiveTab.style.opacity = '0';
-                currentActiveTab.style.transition = 'opacity 0.2s ease-in-out';
-                
-                // Masquer complètement APRÈS la transition
-                setTimeout(() => {
-                    currentActiveTab.style.display = 'none';
-                }, 200); 
-            }
-
-            // 2. Préparer le nouvel onglet
-            const newTab = document.getElementById('tab-' + tabName);
-            newTab.style.display = 'flex';
-            newTab.style.opacity = '0'; // Commence caché (transparent)
-            newTab.style.transition = 'opacity 0.2s ease-in-out';
-
-            // 3. Transition d'entrée : Afficher le nouvel onglet en douceur (après un petit délai)
-            setTimeout(() => {
-                newTab.style.opacity = '1';
-            }, 50); 
-
-            // 4. Gérer l'état actif du menu
-            navItems.forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+            document.getElementById('tab-' + tabName).style.display = 'flex';
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             element.classList.add('active');
 
-            // 5. Rafraîchissement des données (si on revient de booking)
             if (tabName === 'home' || tabName === 'profile') {
                 window.dispatchEvent(new Event('refreshAppointments'));
             }
