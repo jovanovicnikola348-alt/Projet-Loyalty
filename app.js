@@ -25,7 +25,10 @@ const langData = {
         navHistory: "Visites", profileTitle: "Mon Profil", langLabel: "Changer la langue :",
         phEmail: "Email", phPassword: "Mot de passe", phUsername: "Nom/Pseudo",
         login: "Se connecter", signup: "Inscription", signupToggle: "Vous n'avez pas de compte ? S'inscrire",
-        historyTitle: "Historique des visites", noHistory: "Aucune visite enregistrée."
+        historyTitle: "Historique des visites", noHistory: "Aucune visite enregistrée.",
+        emailInvalid: "L'adresse email n'est pas valide.",
+        emailUsed: "Cet email est déjà utilisé.",
+        passTooWeak: "Mot de passe trop faible (min 6)"
     },
     sr: { 
         title: "Prijava", google: "Nastavi sa Google-om", loyalty: "Moja lojalnost", 
