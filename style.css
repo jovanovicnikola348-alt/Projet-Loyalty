@@ -55,9 +55,16 @@ section { padding: 0; flex-grow: 1; display: flex; flex-direction: column; overf
     flex-direction: column; 
     height: calc(100vh - 150px); /* Hauteur fixe pour les onglets normaux */
     padding-bottom: 90px;
+    opacity: 0; /* Ajouté pour la transition JS */
+    transition: opacity 0.2s ease-in-out; /* Transition CSS */
 }
-#tab-booking { padding: 0; height: calc(100vh - 100px); overflow-y: hidden; } /* Ajusté pour l'iframe */
+#tab-booking { padding: 0; height: calc(100vh - 100px); overflow-y: hidden; }
 
+/* Rendre visible l'onglet actif (sinon il reste caché par l'opacité) */
+.tab-content[style*="display: flex"] {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
 
 /* 3. Formulaires & Boutons */
 input {
@@ -74,18 +81,18 @@ button {
 }
 button:active { opacity: 0.8; }
 
-.primary-btn { background: var(--text-dark); color: var(--bg-light); } 
+.primary-btn { background: var(--primary); color: var(--bg-light); } 
 .secondary-btn { 
     background: var(--bg-light); 
-    color: var(--text-dark); 
-    border: 1px solid var(--text-dark);
+    color: var(--primary); 
+    border: 1px solid var(--primary);
 }
-.google-btn { background: white; color: var(--text-dark); border: 1px solid #E0E0E0; }
+.google-btn { background: var(--bg-light); color: var(--text-dark); border: 1px solid var(--accent); }
 
 .auth-buttons { display: flex; gap: 10px; } 
 .auth-buttons button { flex: 1; margin-top: 15px; }
 
-.separator { margin: 25px 0; color: var(--secondary); font-size: 14px; text-align: center;}
+.separator { margin: 25px 0; color: var(--accent); font-size: 14px; text-align: center;}
 .small-link { color: var(--link-color); font-size: 12px; margin-top: 15px; cursor: pointer; text-align: center;}
 .error-message { color: #c0392b; font-size: 12px; display: block; margin-top: -10px; text-align: left; margin-bottom: 5px;}
 
@@ -135,10 +142,9 @@ iframe {
     border: none; 
     background: white; 
     border-radius: 8px; 
-    padding-bottom: 80px; /* Pousse le contenu vers le haut de 80px */
+    padding-bottom: 80px; 
     box-sizing: content-box; 
 }
-
 
 /* 6. HISTORIQUE CLIENT */
 #visit-history-client { margin-top: 20px; }
