@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Friz kod Francuza - Loyalty</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link rel="icon" href="data:,">
 </head>
 <body>
@@ -16,7 +16,7 @@
 
         <!-- SECTION CONNEXION -->
         <section id="login-section">
-            <div style="text-align: right; margin-bottom: 15px;">
+            <div class="lang-wrapper">
                 <select id="lang-select" class="lang-dropdown">
                     <option value="fr">🇫🇷 FR</option>
                     <option value="sr">🇷🇸 SR</option>
@@ -24,29 +24,31 @@
                 </select>
             </div>
 
-            <h2 id="txt-title">Connexion</h2>
-            <input type="email" id="email" placeholder="Email">
-            <span id="email-error" class="error-message"></span>
-            
-            <input type="text" id="username" placeholder="Nom/Pseudo" style="display:none;">
-            <span id="username-error" class="error-message"></span>
-            
-            <input type="password" id="password" placeholder="Mot de passe">
-            <span id="password-error" class="error-message"></span>
-            
-            <div class="auth-buttons">
-                <button id="btn-login" class="primary-btn">Se connecter</button>
-                <button id="btn-signup" class="secondary-btn" style="display:none;">Inscription</button>
+            <div class="login-card">
+                <h2 id="txt-title">Connexion</h2>
+                <input type="email" id="email" placeholder="Email">
+                <span id="email-error" class="error-message"></span>
+                
+                <input type="text" id="username" placeholder="Nom/Pseudo" style="display:none;">
+                <span id="username-error" class="error-message"></span>
+                
+                <input type="password" id="password" placeholder="Mot de passe">
+                <span id="password-error" class="error-message"></span>
+                
+                <div class="auth-buttons">
+                    <button id="btn-login" class="primary-btn">Se connecter</button>
+                    <button id="btn-signup" class="secondary-btn" style="display:none;">Inscription</button>
+                </div>
+
+                <div class="separator">— ou —</div>
+
+                <button id="btn-google" class="google-btn">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" alt="">
+                    <span id="txt-google">Continuer avec Google</span>
+                </button>
+                
+                <p id="toggle-signup" class="small-link">Vous n'avez pas de compte ? S'inscrire</p>
             </div>
-
-            <div class="separator">— OR —</div>
-
-            <button id="btn-google" class="google-btn">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
-                <span id="txt-google">Continuer avec Google</span>
-            </button>
-            
-            <p id="toggle-signup" class="small-link">Vous n'avez pas de compte ? S'inscrire</p>
         </section>
 
         <!-- SECTION CLIENT -->
