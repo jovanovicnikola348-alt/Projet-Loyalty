@@ -48,7 +48,6 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('login-section').style.display = 'none';
         document.getElementById('client-section').style.display = 'flex'; 
 
-        // FIX : AFFICHE LE HOME IMMÉDIATEMENT SANS ATTENDRE LE CLICK
         const homeTab = document.getElementById('tab-home');
         homeTab.style.display = 'flex';
         homeTab.style.opacity = '1'; 
@@ -71,7 +70,6 @@ onAuthStateChanged(auth, async (user) => {
                 document.getElementById('qrcode').innerHTML = "";
                 new QRCode(document.getElementById('qrcode'), { text: user.uid, width: 140, height: 140, colorDark: '#1A1A1A' });
 
-                // HISTORIQUE CLIENT TRADUIT
                 const histDiv = document.getElementById('visit-history-client');
                 const history = data.history || [];
                 if (histDiv) {
