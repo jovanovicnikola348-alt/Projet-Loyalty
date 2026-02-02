@@ -137,6 +137,7 @@
     <script type="module" src="app.js"></script>
 
     <script>
+        // FONCTION SHOWTAB CORRIGÉE POUR LA STABILITÉ (PAS DE TRANSITION D'OPACITÉ)
         function showTab(tabName, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
             document.getElementById('tab-' + tabName).style.display = 'flex';
