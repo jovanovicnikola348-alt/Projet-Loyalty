@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, setPersistence, browserSessionPersistence, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -126,24 +126,40 @@ function setupUserSnapshot(user) {
     });
 }
 
-if (DEBUG) debug('app.js chargé, getRedirectResult démarré');
-getRedirectResult(auth).then(async (result) => {
-    if (DEBUG) debug('getRedirectResult: result=' + (result && result.user ? result.user.uid : 'null'));
-    if (result && result.user) {
-        if (DEBUG) debug('Redirect Google OK, mise à jour Firestore...');
-        const userRef = doc(db, "users", result.user.uid);
-        const userSnap = await getDoc(userRef);
-        if (!userSnap.exists()) {
-            await setDoc(userRef, { email: result.user.email, displayName: result.user.displayName, points: 0, history: [] });
-        } else {
-            await updateDoc(userRef, { email: result.user.email, displayName: result.user.displayName });
-        }
-        if (DEBUG) debug('Firestore OK, appel showClientUI');
-        showClientUI(result.user);
+async function applyRedirectResult(result) {
+    if (!result || !result.user) return false;
+    if (DEBUG) debug('Redirect Google OK, mise à jour Firestore...');
+    const userRef = doc(db, "users", result.user.uid);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) {
+        await setDoc(userRef, { email: result.user.email, displayName: result.user.displayName, points: 0, history: [] });
+    } else {
+        await updateDoc(userRef, { email: result.user.email, displayName: result.user.displayName });
     }
-}).catch((err) => {
-    if (DEBUG) debug('getRedirectResult ERREUR: ' + (err && err.message ? err.message : String(err)), 'err');
-});
+    if (DEBUG) debug('Firestore OK, appel showClientUI');
+    showClientUI(result.user);
+    return true;
+}
+
+if (DEBUG) debug('app.js chargé, getRedirectResult démarré');
+const REDIRECT_RETRY_DELAYS = [500, 1200, 2500];
+function tryGetRedirectResult(attempt) {
+    getRedirectResult(auth).then(async (result) => {
+        if (DEBUG) debug('getRedirectResult (tentative ' + (attempt + 1) + '): result=' + (result && result.user ? result.user.uid : 'null'));
+        const applied = await applyRedirectResult(result);
+        if (!applied && isMobileOrWebView() && attempt < REDIRECT_RETRY_DELAYS.length) {
+            const delay = REDIRECT_RETRY_DELAYS[attempt];
+            if (DEBUG) debug('Redirect null sur mobile, retry dans ' + delay + 'ms');
+            setTimeout(() => tryGetRedirectResult(attempt + 1), delay);
+        }
+    }).catch((err) => {
+        if (DEBUG) debug('getRedirectResult ERREUR: ' + (err && err.message ? err.message : String(err)), 'err');
+        if (isMobileOrWebView() && attempt < REDIRECT_RETRY_DELAYS.length) {
+            setTimeout(() => tryGetRedirectResult(attempt + 1), REDIRECT_RETRY_DELAYS[attempt] || 1000);
+        }
+    });
+}
+tryGetRedirectResult(0);
 
 const langData = {
     fr: { title: "Connexion", google: "Continuer avec Google", loyalty: "Ma Fidélité", gift: "🎁 Coupe offerte !", logout: "Déconnexion", qr: "Présentez ce code au salon :", next: "Prochain RDV", navHome: "Accueil", navBooking: "Rendez-vous", navProfile: "Profil", navHistory: "Visites", profileTitle: "Mon Profil", langLabel: "Changer la langue :", phEmail: "Email", phPassword: "Mot de passe", phUsername: "Nom/Pseudo", login: "Se connecter", signup: "Inscription", signupToggle: "Vous n'avez pas de compte ? S'inscrire", historyTitle: "Historique des visites", noHistory: "Aucune visite enregistrée.", emailInvalid: "L'adresse email n'est pas valide.", emailUsed: "Cet email est déjà utilisé.", passTooWeak: "Mot de passe trop faible (min 6)", visitOn: "Visite du", settingsTitle: "Paramètres du compte", displayNameLabel: "Nom affiché", emailLabel: "Email", saveProfile: "Enregistrer", profileUpdated: "Profil mis à jour.", nameRequired: "Le nom est requis.", resetOnDate: "Les points seront réinitialisés le %s (%s).", week: "semaine", weeks: "semaines", day: "jour", days: "jours", and: " et " },
@@ -224,7 +240,10 @@ document.getElementById('btn-google').onclick = async () => {
     if (DEBUG) debug('Clic Google, isMobile=' + isMobileOrWebView());
     const provider = new GoogleAuthProvider();
     if (isMobileOrWebView()) {
-        if (DEBUG) debug('Redirection Google (redirect)...');
+        if (DEBUG) debug('Persistance session + redirection Google...');
+        try {
+            await setPersistence(auth, browserSessionPersistence);
+        } catch (e) { if (DEBUG) debug('setPersistence: ' + (e.message || e)); }
         await signInWithRedirect(auth, provider);
         return;
     }
