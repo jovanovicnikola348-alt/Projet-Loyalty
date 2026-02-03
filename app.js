@@ -100,6 +100,28 @@ function debug(msg, type = 'info') {
     }
 }
 
+// CONFIG : durée avant reset à partir du premier point (en mois)
+const RESET_MONTHS = 6; // change si tu veux 3, 12, etc.
+
+function addMonths(date, months) {
+    const d = new Date(date);
+    const day = d.getDate();
+    d.setMonth(d.getMonth() + months);
+    // handle month overflow
+    if (d.getDate() !== day) {
+        d.setDate(0);
+    }
+    return d;
+}
+
+function formatDateForDisplay(date) {
+    if (!date) return '';
+    try {
+        const d = new Date(date);
+        return d.toLocaleDateString(localStorage.getItem('userLang') === 'fr' ? 'fr-FR' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+    } catch(e) { return String(date); }
+}
+
 function isMobileOrWebView() {
     const ua = navigator.userAgent || navigator.vendor || window.opera || '';
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(ua);
@@ -144,10 +166,44 @@ function setupUserSnapshot(user) {
         if (DEBUG) debug('onSnapshot: exists=' + snap.exists());
         if (!snap.exists()) return;
         const data = snap.data();
+
+        // ----- Ensure firstPointDate + periodEndDate exists for users with points (migration & new behavior)
+        try {
+            if (data.points > 0 && !data.firstPointDate) {
+                // Try to infer firstPointDate from history if present
+                let inferred = null;
+                if (Array.isArray(data.history) && data.history.length > 0) {
+                    try {
+                        const times = data.history.map(h => new Date(h).getTime()).filter(t => !isNaN(t));
+                        if (times.length > 0) inferred = new Date(Math.min(...times));
+                    } catch (e) { if (DEBUG) debug('infer history date failed: ' + (e && e.message ? e.message : e), 'err'); }
+                }
+                if (!inferred) inferred = new Date();
+                const periodEnd = addMonths(inferred, RESET_MONTHS);
+                await updateDoc(doc(db, "users", user.uid), { firstPointDate: inferred.toISOString(), periodEndDate: periodEnd.toISOString() });
+                if (DEBUG) debug('Set firstPointDate & periodEndDate from snapshot for uid=' + user.uid, 'ok');
+                // Refresh local data object by refetching snap
+                // Note: subsequent onSnapshot call will send updated data
+            }
+        } catch (e) {
+            if (DEBUG) debug('Erreur ensureFirstPointDate: ' + (e && e.message ? e.message : e), 'err');
+        }
+
         const currentLang = localStorage.getItem('userLang') || 'sr';
         const t = langData[currentLang] || langData.sr;
         if (document.getElementById('profile-display-name') && data.displayName !== undefined)
             document.getElementById('profile-display-name').value = data.displayName;
+
+        // Show first point date in UI if present
+        const firstPointEl = document.getElementById('first-point-display');
+        const firstPointContainer = document.getElementById('first-point-date');
+        if (data.firstPointDate) {
+            if (firstPointEl) firstPointEl.innerText = formatDateForDisplay(data.firstPointDate);
+            if (firstPointContainer) firstPointContainer.style.display = 'block';
+        } else {
+            if (firstPointContainer) firstPointContainer.style.display = 'none';
+        }
+
         const periodEnd = data.periodEndDate ? new Date(data.periodEndDate) : null;
         const now = new Date();
         if (periodEnd && periodEnd <= now && data.points > 0) {
