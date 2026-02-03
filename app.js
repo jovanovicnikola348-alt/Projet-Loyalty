@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, setPersistence, browserSessionPersistence, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, setPersistence, browserSessionPersistence, browserLocalPersistence, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -151,6 +151,14 @@ function tryGetRedirectResult(attempt) {
             const delay = REDIRECT_RETRY_DELAYS[attempt];
             if (DEBUG) debug('Redirect null sur mobile, retry dans ' + delay + 'ms');
             setTimeout(() => tryGetRedirectResult(attempt + 1), delay);
+        } else if (!applied && isMobileOrWebView() && attempt >= REDIRECT_RETRY_DELAYS.length) {
+            // After all retries still null — helpful debugging hints
+            if (DEBUG) debug('getRedirectResult toujours null après tentatives sur mobile. Vérifie : autorized domains dans Firebase, redirect URIs dans Google Cloud OAuth, et le blocage des cookies dans Safari (ITP).', 'err');
+            // Friendly suggestion to user/developer
+            const panelEl = document.getElementById('debug-log');
+            if (panelEl) {
+                panelEl.appendChild(document.createElement('div')).textContent = '[⚠️] Redirection mobile non appliquée — essayer avec Chrome mobile ou vérifier les paramètres de cookies / domaines autorisés.';
+            }
         }
     }).catch((err) => {
         if (DEBUG) debug('getRedirectResult ERREUR: ' + (err && err.message ? err.message : String(err)), 'err');
@@ -199,6 +207,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (panel) panel.style.display = 'block';
         debug('DOMContentLoaded, userAgent=' + (navigator.userAgent || '').substring(0, 60));
         debug('Mobile/WebView=' + isMobileOrWebView());
+        // Added logs to help debug redirect results on mobile/Safari
+        debug('location.href=' + (location.href || '')); 
+        debug('location.search=' + (location.search || '') + ' location.hash=' + (location.hash || ''));
+        debug('document.referrer=' + (document.referrer || ''));
         const closeBtn = document.getElementById('debug-close');
         if (closeBtn) closeBtn.onclick = () => { if (panel) panel.style.display = 'none'; };
     }
@@ -240,10 +252,19 @@ document.getElementById('btn-google').onclick = async () => {
     if (DEBUG) debug('Clic Google, isMobile=' + isMobileOrWebView());
     const provider = new GoogleAuthProvider();
     if (isMobileOrWebView()) {
-        if (DEBUG) debug('Persistance session + redirection Google...');
+        if (DEBUG) debug('Persistance mobile: essayer session puis local, puis redirection Google...');
         try {
             await setPersistence(auth, browserSessionPersistence);
-        } catch (e) { if (DEBUG) debug('setPersistence: ' + (e.message || e)); }
+            if (DEBUG) debug('setPersistence: session OK');
+        } catch (e) {
+            if (DEBUG) debug('session persistence failed: ' + (e.message || e));
+            try {
+                await setPersistence(auth, browserLocalPersistence);
+                if (DEBUG) debug('setPersistence: local OK');
+            } catch (e2) {
+                if (DEBUG) debug('setPersistence local failed: ' + (e2.message || e2));
+            }
+        }
         await signInWithRedirect(auth, provider);
         return;
     }
