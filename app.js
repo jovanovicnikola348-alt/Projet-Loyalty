@@ -20,23 +20,33 @@ function isMobileOrWebView() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(ua);
 }
 
+function showClientUI(user) {
+    const loginSection = document.getElementById('login-section');
+    const clientSection = document.getElementById('client-section');
+    const homeTab = document.getElementById('tab-home');
+    if (loginSection) loginSection.style.display = 'none';
+    if (clientSection) clientSection.style.display = 'flex';
+    if (homeTab) {
+        homeTab.style.display = 'flex';
+        homeTab.style.opacity = '1';
+    }
+    const displayName = user.displayName || (user.email ? user.email.split('@')[0] : '');
+    const profileNameInput = document.getElementById('profile-display-name');
+    const emailDisplay = document.getElementById('user-email-display');
+    if (profileNameInput) profileNameInput.value = displayName;
+    if (emailDisplay) emailDisplay.innerText = user.email || '';
+    setupUserSnapshot(user);
+}
+
 function initApp() {
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            document.getElementById('login-section').style.display = 'none';
-            document.getElementById('client-section').style.display = 'flex';
-            const homeTab = document.getElementById('tab-home');
-            homeTab.style.display = 'flex';
-            homeTab.style.opacity = '1';
-            const displayName = user.displayName || user.email.split('@')[0];
-            const profileNameInput = document.getElementById('profile-display-name');
-            const emailDisplay = document.getElementById('user-email-display');
-            if (profileNameInput) profileNameInput.value = displayName;
-            if (emailDisplay) emailDisplay.innerText = user.email || '';
-            setupUserSnapshot(user);
+            showClientUI(user);
         } else {
-            document.getElementById('login-section').style.display = 'block';
-            document.getElementById('client-section').style.display = 'none';
+            const loginSection = document.getElementById('login-section');
+            const clientSection = document.getElementById('client-section');
+            if (loginSection) loginSection.style.display = 'block';
+            if (clientSection) clientSection.style.display = 'none';
         }
     });
 }
@@ -107,6 +117,7 @@ getRedirectResult(auth).then(async (result) => {
         } else {
             await updateDoc(userRef, { email: result.user.email, displayName: result.user.displayName });
         }
+        showClientUI(result.user);
     }
 }).catch(() => {});
 

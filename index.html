@@ -130,8 +130,13 @@
         </section>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script type="module" src="app.js"></script>
+    <script>
+        if (window.location.protocol === 'file:') {
+            document.body.innerHTML = '<div style="padding:20px;font-family:sans-serif;text-align:center;max-width:400px;margin:40px auto;"><p style="color:#c0392b;">⚠️ Ouvrez le site via un serveur web (pas en double-clic sur le fichier).</p><p>Lancez dans le dossier du projet : <code style="background:#eee;padding:4px 8px;">npm run preview</code></p><p>Puis ouvrez l’URL affichée (ex. http://localhost:8080).</p></div>';
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" crossorigin="anonymous"></script>
+    <script type="module" src="./app.js"></script>
 
     <script>
         function showTab(tabName, element) {
