@@ -177,12 +177,13 @@ function setupUserSnapshot(user) {
                     }
                 }
 
-                // Else, try to parse any history entries that are valid dates
+                // Else, try to parse any history entries that are valid dates (localized parsing)
                 if (!inferred && Array.isArray(data.history) && data.history.length > 0) {
                     try {
-                        const times = data.history.map(h => new Date(h).getTime()).filter(t => !isNaN(t));
-                        if (times.length > 0) inferred = new Date(Math.min(...times));
-                        if (inferred && DEBUG) debug('Inferred firstPointDate from history for uid=' + user.uid, 'ok');
+                        // Try parsing via multiple strategies
+                        const parsedTimes = data.history.map(h => parseHistoryEntryToMillis(h)).filter(t => t && !isNaN(t));
+                        if (parsedTimes.length > 0) inferred = new Date(Math.min(...parsedTimes));
+                        if (inferred && DEBUG) debug('Inferred firstPointDate from history for uid=' + user.uid + ' -> ' + inferred.toISOString(), 'ok');
                     } catch (e) { if (DEBUG) debug('infer history date failed: ' + (e && e.message ? e.message : e), 'err'); }
                 }
 
@@ -244,10 +245,8 @@ function setupUserSnapshot(user) {
             const dateStr = periodEnd.toLocaleDateString(locale, { day: 'numeric', month: 'long' });
             const msLeft = periodEnd - now;
             const daysLeft = Math.ceil(msLeft / (24 * 60 * 60 * 1000));
-            const weeks = Math.floor(daysLeft / 7);
-            const wLabel = weeks === 1 ? t.week : t.weeks;
             const dLabel = daysLeft === 1 ? t.day : t.days;
-            const paren = daysLeft >= 7 ? `${weeks} ${wLabel}` : `${daysLeft} ${dLabel}`;
+            const paren = `${daysLeft} ${dLabel}`; // always show days
             const parts = t.resetOnDate.split('%s');
             countdownText.innerText = (parts[0] || '') + dateStr + (parts[1] || '') + paren + (parts[2] || '');
             countdownCard.style.display = "block";
@@ -367,6 +366,55 @@ const langData = {
     sr: { title: "Prijava", google: "Nastavi sa Google-om", loyalty: "Moja lojalnost", gift: "🎁 Besplatno šišanje !", logout: "Odjavi se", qr: "Pokažite ovaj kod u salonu :", next: "Sledeći termin", navHome: "Početna", navBooking: "Termini", navProfile: "Profil", navHistory: "Posete", profileTitle: "Moj Profil", langLabel: "Promeni jezik :", phEmail: "Email", phPassword: "Lozinka", phUsername: "Ime/Nadimak", login: "Prijavi se", signup: "Registracija", signupToggle: "Nemate nalog? Registracija", historyTitle: "Istorija poseta", noHistory: "Nema zabeleženih poseta.", emailInvalid: "Neispravna adresa e-pošte.", emailUsed: "Ovaj e-mail je već u upotrebi.", passTooWeak: "Lozinka je preslaba (min 6)", visitOn: "Poseta dana", settingsTitle: "Podešavanja naloga", displayNameLabel: "Prikazano ime", emailLabel: "Email", saveProfile: "Sačuvaj", profileUpdated: "Profil ažuriran.", nameRequired: "Ime je obavezno.", resetOnDate: "Poeni će se resetovati %s (%s).", week: "nedelja", weeks: "nedelja", day: "dan", days: "dana", and: " i " },
     en: { title: "Login", google: "Continue with Google", loyalty: "My Loyalty", gift: "🎁 Free Haircut !", logout: "Logout", qr: "Show this code at the salon:", next: "Next Appointment", navHome: "Home", navBooking: "Booking", navProfile: "Profile", navHistory: "History", profileTitle: "My Profile", langLabel: "Change Language :", phEmail: "Email", phPassword: "Password", phUsername: "Name/Nickname", login: "Login", signup: "Signup", signupToggle: "Don't have an account? Sign up", historyTitle: "Visit History", noHistory: "No recorded visits.", emailInvalid: "Invalid email address.", emailUsed: "This email is already in use.", passTooWeak: "Password too weak (min 6)", visitOn: "Visit on", settingsTitle: "Account settings", displayNameLabel: "Display name", emailLabel: "Email", saveProfile: "Save", profileUpdated: "Profile updated.", nameRequired: "Name is required.", resetOnDate: "Points will reset on %s (%s).", week: "week", weeks: "weeks", day: "day", days: "days", and: " and " }
 };
+
+// Parse localized history entries (fr/sr) into ms since epoch
+function parseHistoryEntryToMillis(text) {
+    if (!text || typeof text !== 'string') return null;
+    // Try native parse first
+    const d1 = new Date(text);
+    if (!isNaN(d1.getTime())) return d1.getTime();
+
+    const lower = text.toLowerCase();
+    const now = new Date();
+    const currentYear = now.getFullYear();
+
+    // month maps
+    const frMonths = { 'janvier':0, 'février':1, 'fevrier':1, 'mars':2, 'avril':3, 'mai':4, 'juin':5, 'juillet':6, 'août':7, 'aout':7, 'septembre':8, 'octobre':9, 'novembre':10, 'décembre':11, 'decembre':11 };
+    const srMonths = { 'januar':0, 'februar':1, 'mart':2, 'april':3, 'maj':4, 'juni':5, 'jul':6, 'avgust':7, 'septembar':8, 'oktobar':9, 'novembar':10, 'decembar':11 };
+
+    // FR pattern e.g. "2 février à 21h38" or "2 février 21:38"
+    const frRegex = /([0-9]{1,2})\s+([a-zéûôàç]+)\s*(?:à| )\s*([0-9]{1,2})[:h]([0-9]{2})/i;
+    const mfr = lower.match(frRegex);
+    if (mfr) {
+        const day = parseInt(mfr[1],10);
+        const mon = frMonths[mfr[2]];
+        const hour = parseInt(mfr[3],10);
+        const min = parseInt(mfr[4],10);
+        if (!isNaN(mon)) {
+            let dt = new Date(currentYear, mon, day, hour, min);
+            // if in future by > 180 days, assume last year
+            if (dt.getTime() - now.getTime() > 180*24*60*60*1000) dt.setFullYear(currentYear -1);
+            return dt.getTime();
+        }
+    }
+
+    // SR pattern e.g. "2. februar u 21h38" or similar
+    const srRegex = /([0-9]{1,2})\.?\s*([a-zćčž]{3,})\s*(?:u|\s)\s*([0-9]{1,2})[:h]([0-9]{2})/i;
+    const msr = lower.match(srRegex);
+    if (msr) {
+        const day = parseInt(msr[1],10);
+        const mon = srMonths[msr[2]];
+        const hour = parseInt(msr[3],10);
+        const min = parseInt(msr[4],10);
+        if (!isNaN(mon)) {
+            let dt = new Date(currentYear, mon, day, hour, min);
+            if (dt.getTime() - now.getTime() > 180*24*60*60*1000) dt.setFullYear(currentYear -1);
+            return dt.getTime();
+        }
+    }
+
+    return null;
+}
 
 function updateLanguage(lang) {
     const t = langData[lang];

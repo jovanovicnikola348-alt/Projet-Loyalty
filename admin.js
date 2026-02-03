@@ -91,8 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (change > 0) {
                 updates.history = arrayUnion(getNiceDate());
                 if (currentData.points === 0) {
+                    const nowIso = new Date().toISOString();
                     const endDate = new Date(Date.now() + 33 * 24 * 60 * 60 * 1000);
                     updates.periodEndDate = endDate.toISOString();
+                    updates.firstPointDate = nowIso; // set firstPointDate when first point is added
                 }
             }
             await updateDoc(userRef, updates);
