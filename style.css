@@ -357,6 +357,23 @@ button {
 }
 
 /* ========== QR SECTION ========== */
+.countdown-card {
+    background: linear-gradient(135deg, rgba(201, 162, 39, 0.15) 0%, rgba(212, 165, 116, 0.08) 100%);
+    border: 1px solid rgba(201, 162, 39, 0.35);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+}
+
+.countdown-text {
+    margin: 0;
+    font-size: 15px;
+    color: var(--text);
+    text-align: center;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
 .qr-section {
     text-align: center;
     margin-top: 28px;

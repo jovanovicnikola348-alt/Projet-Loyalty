@@ -83,11 +83,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const userRef = doc(db, "users", selectedUserId);
         const userSnap = await getDoc(userRef);
         
+        const currentData = userSnap.data();
         if (change === "RESET") {
-            await updateDoc(userRef, { points: 0 });
+            await updateDoc(userRef, { points: 0, history: [], periodEndDate: null });
         } else {
             const updates = { points: increment(change) };
-            if (change > 0) updates.history = arrayUnion(getNiceDate());
+            if (change > 0) {
+                updates.history = arrayUnion(getNiceDate());
+                if (currentData.points === 0) {
+                    const endDate = new Date(Date.now() + 35 * 24 * 60 * 60 * 1000);
+                    updates.periodEndDate = endDate.toISOString();
+                }
+            }
             await updateDoc(userRef, updates);
         }
         
@@ -96,9 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // LOGIQUE : Reset Automatique après 5 points
         if (newDoc.data().points >= 5 && change > 0) {
-            if (confirm("Le client a atteint 5 points. Le cadeau a-t-il été donné ? (OK pour Reset à 0)")) {
-                 await updateDoc(userRef, { points: 0 });
-                 alert("Points réinitialisés à 0.");
+            if (confirm(translations[lang].confirmGift)) {
+                 await updateDoc(userRef, { points: 0, history: [], periodEndDate: null });
+                 alert(translations[lang].resetDone);
             }
         }
     }

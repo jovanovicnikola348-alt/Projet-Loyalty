@@ -16,9 +16,9 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const langData = {
-    fr: { title: "Connexion", google: "Continuer avec Google", loyalty: "Ma Fidélité", gift: "🎁 Coupe offerte !", logout: "Déconnexion", qr: "Présentez ce code au salon :", next: "Prochain RDV", navHome: "Accueil", navBooking: "Rendez-vous", navProfile: "Profil", navHistory: "Visites", profileTitle: "Mon Profil", langLabel: "Changer la langue :", phEmail: "Email", phPassword: "Mot de passe", phUsername: "Nom/Pseudo", login: "Se connecter", signup: "Inscription", signupToggle: "Vous n'avez pas de compte ? S'inscrire", historyTitle: "Historique des visites", noHistory: "Aucune visite enregistrée.", emailInvalid: "L'adresse email n'est pas valide.", emailUsed: "Cet email est déjà utilisé.", passTooWeak: "Mot de passe trop faible (min 6)", visitOn: "Visite du", settingsTitle: "Paramètres du compte", displayNameLabel: "Nom affiché", emailLabel: "Email", saveProfile: "Enregistrer", profileUpdated: "Profil mis à jour.", nameRequired: "Le nom est requis." },
-    sr: { title: "Prijava", google: "Nastavi sa Google-om", loyalty: "Moja lojalnost", gift: "🎁 Besplatno šišanje !", logout: "Odjavi se", qr: "Pokažite ovaj kod u salonu :", next: "Sledeći termin", navHome: "Početna", navBooking: "Termini", navProfile: "Profil", navHistory: "Posete", profileTitle: "Moj Profil", langLabel: "Promeni jezik :", phEmail: "Email", phPassword: "Lozinka", phUsername: "Ime/Nadimak", login: "Prijavi se", signup: "Registracija", signupToggle: "Nemate nalog? Registracija", historyTitle: "Istorija poseta", noHistory: "Nema zabeleženih poseta.", emailInvalid: "Neispravna adresa e-pošte.", emailUsed: "Ovaj e-mail je već u upotrebi.", passTooWeak: "Lozinka je preslaba (min 6)", visitOn: "Poseta dana", settingsTitle: "Podešavanja naloga", displayNameLabel: "Prikazano ime", emailLabel: "Email", saveProfile: "Sačuvaj", profileUpdated: "Profil ažuriran.", nameRequired: "Ime je obavezno." },
-    en: { title: "Login", google: "Continue with Google", loyalty: "My Loyalty", gift: "🎁 Free Haircut !", logout: "Logout", qr: "Show this code at the salon:", next: "Next Appointment", navHome: "Home", navBooking: "Booking", navProfile: "Profile", navHistory: "History", profileTitle: "My Profile", langLabel: "Change Language :", phEmail: "Email", phPassword: "Password", phUsername: "Name/Nickname", login: "Login", signup: "Signup", signupToggle: "Don't have an account? Sign up", historyTitle: "Visit History", noHistory: "No recorded visits.", emailInvalid: "Invalid email address.", emailUsed: "This email is already in use.", passTooWeak: "Password too weak (min 6)", visitOn: "Visit on", settingsTitle: "Account settings", displayNameLabel: "Display name", emailLabel: "Email", saveProfile: "Save", profileUpdated: "Profile updated.", nameRequired: "Name is required." }
+    fr: { title: "Connexion", google: "Continuer avec Google", loyalty: "Ma Fidélité", gift: "🎁 Coupe offerte !", logout: "Déconnexion", qr: "Présentez ce code au salon :", next: "Prochain RDV", navHome: "Accueil", navBooking: "Rendez-vous", navProfile: "Profil", navHistory: "Visites", profileTitle: "Mon Profil", langLabel: "Changer la langue :", phEmail: "Email", phPassword: "Mot de passe", phUsername: "Nom/Pseudo", login: "Se connecter", signup: "Inscription", signupToggle: "Vous n'avez pas de compte ? S'inscrire", historyTitle: "Historique des visites", noHistory: "Aucune visite enregistrée.", emailInvalid: "L'adresse email n'est pas valide.", emailUsed: "Cet email est déjà utilisé.", passTooWeak: "Mot de passe trop faible (min 6)", visitOn: "Visite du", settingsTitle: "Paramètres du compte", displayNameLabel: "Nom affiché", emailLabel: "Email", saveProfile: "Enregistrer", profileUpdated: "Profil mis à jour.", nameRequired: "Le nom est requis.", countdownPrefix: "Il te reste encore ", countdownSuffix: " avant la réinitialisation des points.", week: "semaine", weeks: "semaines", day: "jour", days: "jours", and: " et " },
+    sr: { title: "Prijava", google: "Nastavi sa Google-om", loyalty: "Moja lojalnost", gift: "🎁 Besplatno šišanje !", logout: "Odjavi se", qr: "Pokažite ovaj kod u salonu :", next: "Sledeći termin", navHome: "Početna", navBooking: "Termini", navProfile: "Profil", navHistory: "Posete", profileTitle: "Moj Profil", langLabel: "Promeni jezik :", phEmail: "Email", phPassword: "Lozinka", phUsername: "Ime/Nadimak", login: "Prijavi se", signup: "Registracija", signupToggle: "Nemate nalog? Registracija", historyTitle: "Istorija poseta", noHistory: "Nema zabeleženih poseta.", emailInvalid: "Neispravna adresa e-pošte.", emailUsed: "Ovaj e-mail je već u upotrebi.", passTooWeak: "Lozinka je preslaba (min 6)", visitOn: "Poseta dana", settingsTitle: "Podešavanja naloga", displayNameLabel: "Prikazano ime", emailLabel: "Email", saveProfile: "Sačuvaj", profileUpdated: "Profil ažuriran.", nameRequired: "Ime je obavezno.", countdownPrefix: "Preostalo ti je još ", countdownSuffix: " do resetovanja poena.", week: "nedelja", weeks: "nedelja", day: "dan", days: "dana", and: " i " },
+    en: { title: "Login", google: "Continue with Google", loyalty: "My Loyalty", gift: "🎁 Free Haircut !", logout: "Logout", qr: "Show this code at the salon:", next: "Next Appointment", navHome: "Home", navBooking: "Booking", navProfile: "Profile", navHistory: "History", profileTitle: "My Profile", langLabel: "Change Language :", phEmail: "Email", phPassword: "Password", phUsername: "Name/Nickname", login: "Login", signup: "Signup", signupToggle: "Don't have an account? Sign up", historyTitle: "Visit History", noHistory: "No recorded visits.", emailInvalid: "Invalid email address.", emailUsed: "This email is already in use.", passTooWeak: "Password too weak (min 6)", visitOn: "Visit on", settingsTitle: "Account settings", displayNameLabel: "Display name", emailLabel: "Email", saveProfile: "Save", profileUpdated: "Profile updated.", nameRequired: "Name is required.", countdownPrefix: "You have ", countdownSuffix: " left before points reset.", week: "week", weeks: "weeks", day: "day", days: "days", and: " and " }
 };
 
 function updateLanguage(lang) {
@@ -62,19 +62,46 @@ onAuthStateChanged(auth, async (user) => {
         if (profileNameInput) profileNameInput.value = displayName;
         if (emailDisplay) emailDisplay.innerText = user.email || '';
 
-        onSnapshot(doc(db, "users", user.uid), (snap) => {
+        onSnapshot(doc(db, "users", user.uid), async (snap) => {
             if (snap.exists()) {
                 const data = snap.data();
                 const currentLang = localStorage.getItem('userLang') || 'sr';
+                const t = langData[currentLang] || langData.sr;
                 if (document.getElementById('profile-display-name') && data.displayName !== undefined)
                     document.getElementById('profile-display-name').value = data.displayName;
+
+                const periodEnd = data.periodEndDate ? new Date(data.periodEndDate) : null;
+                const now = new Date();
+                if (periodEnd && periodEnd <= now && data.points > 0) {
+                    await updateDoc(doc(db, "users", user.uid), { points: 0, history: [], periodEndDate: null });
+                    return;
+                }
                 
                 document.getElementById('points-display').innerText = `${data.points} / 5`;
                 if(document.getElementById('progress-bar')) document.getElementById('progress-bar').style.width = (data.points / 5 * 100) + "%";
                 
                 const gift = document.getElementById('gift-msg');
                 gift.style.display = data.points >= 5 ? 'block' : 'none';
-                gift.innerText = langData[currentLang].gift;
+                gift.innerText = t.gift;
+
+                const countdownCard = document.getElementById('countdown-card');
+                const countdownText = document.getElementById('countdown-text');
+                if (periodEnd && periodEnd > now && data.points > 0) {
+                    const msLeft = periodEnd - now;
+                    const daysLeft = Math.ceil(msLeft / (24 * 60 * 60 * 1000));
+                    const weeks = Math.floor(daysLeft / 7);
+                    const days = daysLeft % 7;
+                    const wLabel = weeks === 1 ? t.week : t.weeks;
+                    const dLabel = days === 1 ? t.day : t.days;
+                    let middle = "";
+                    if (weeks > 0 && days > 0) middle = `${weeks} ${wLabel}${t.and}${days} ${dLabel}`;
+                    else if (weeks > 0) middle = `${weeks} ${wLabel}`;
+                    else middle = `${days} ${dLabel}`;
+                    countdownText.innerText = t.countdownPrefix + middle + t.countdownSuffix;
+                    countdownCard.style.display = "block";
+                } else {
+                    countdownCard.style.display = "none";
+                }
 
                 document.getElementById('qrcode').innerHTML = "";
                 new QRCode(document.getElementById('qrcode'), { text: user.uid, width: 140, height: 140, colorDark: '#1A1A1A' });
@@ -83,10 +110,10 @@ onAuthStateChanged(auth, async (user) => {
                 const history = data.history || [];
                 if (histDiv) {
                     if (history.length === 0) {
-                        histDiv.innerHTML = `<p style="text-align:center; color: var(--secondary);">${langData[currentLang].noHistory}</p>`;
+                        histDiv.innerHTML = `<p style="text-align:center; color: var(--secondary);">${t.noHistory}</p>`;
                     } else {
                         histDiv.innerHTML = history.slice().reverse().map(date => 
-                            `<div class="history-item-client"><span>${langData[currentLang].visitOn}</span>${date}</div>`
+                            `<div class="history-item-client"><span>${t.visitOn}</span>${date}</div>`
                         ).join('');
                     }
                 }
