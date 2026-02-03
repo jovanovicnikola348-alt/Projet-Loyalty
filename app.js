@@ -20,6 +20,84 @@ function isMobileOrWebView() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(ua);
 }
 
+function initApp() {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('client-section').style.display = 'flex';
+            const homeTab = document.getElementById('tab-home');
+            homeTab.style.display = 'flex';
+            homeTab.style.opacity = '1';
+            const displayName = user.displayName || user.email.split('@')[0];
+            const profileNameInput = document.getElementById('profile-display-name');
+            const emailDisplay = document.getElementById('user-email-display');
+            if (profileNameInput) profileNameInput.value = displayName;
+            if (emailDisplay) emailDisplay.innerText = user.email || '';
+            setupUserSnapshot(user);
+        } else {
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('client-section').style.display = 'none';
+        }
+    });
+}
+
+function setupUserSnapshot(user) {
+    onSnapshot(doc(db, "users", user.uid), async (snap) => {
+        if (!snap.exists()) return;
+        const data = snap.data();
+        const currentLang = localStorage.getItem('userLang') || 'sr';
+        const t = langData[currentLang] || langData.sr;
+        if (document.getElementById('profile-display-name') && data.displayName !== undefined)
+            document.getElementById('profile-display-name').value = data.displayName;
+        const periodEnd = data.periodEndDate ? new Date(data.periodEndDate) : null;
+        const now = new Date();
+        if (periodEnd && periodEnd <= now && data.points > 0) {
+            await updateDoc(doc(db, "users", user.uid), { points: 0, history: [], periodEndDate: null });
+            return;
+        }
+        document.getElementById('points-display').innerText = `${data.points} / 5`;
+        if (document.getElementById('progress-bar')) document.getElementById('progress-bar').style.width = (data.points / 5 * 100) + "%";
+        const gift = document.getElementById('gift-msg');
+        gift.style.display = data.points >= 5 ? 'block' : 'none';
+        gift.innerText = t.gift;
+        const countdownCard = document.getElementById('countdown-card');
+        const countdownText = document.getElementById('countdown-text');
+        if (periodEnd && periodEnd > now && data.points > 0 && countdownCard && countdownText && t.resetOnDate) {
+            const locale = currentLang === 'fr' ? 'fr-FR' : currentLang === 'sr' ? 'sr-RS' : 'en-US';
+            const dateStr = periodEnd.toLocaleDateString(locale, { day: 'numeric', month: 'long' });
+            const msLeft = periodEnd - now;
+            const daysLeft = Math.ceil(msLeft / (24 * 60 * 60 * 1000));
+            const weeks = Math.floor(daysLeft / 7);
+            const wLabel = weeks === 1 ? t.week : t.weeks;
+            const dLabel = daysLeft === 1 ? t.day : t.days;
+            const paren = daysLeft >= 7 ? `${weeks} ${wLabel}` : `${daysLeft} ${dLabel}`;
+            const parts = t.resetOnDate.split('%s');
+            countdownText.innerText = (parts[0] || '') + dateStr + (parts[1] || '') + paren + (parts[2] || '');
+            countdownCard.style.display = "block";
+        } else if (countdownCard) {
+            countdownCard.style.display = "none";
+        }
+        const qrEl = document.getElementById('qrcode');
+        if (qrEl) {
+            qrEl.innerHTML = "";
+            if (typeof QRCode !== 'undefined') {
+                new QRCode(qrEl, { text: user.uid, width: 140, height: 140, colorDark: '#1A1A1A' });
+            }
+        }
+        const histDiv = document.getElementById('visit-history-client');
+        const history = data.history || [];
+        if (histDiv) {
+            if (history.length === 0) {
+                histDiv.innerHTML = `<p style="text-align:center; color: var(--secondary);">${t.noHistory}</p>`;
+            } else {
+                histDiv.innerHTML = history.slice().reverse().map(date =>
+                    `<div class="history-item-client"><span>${t.visitOn}</span>${date}</div>`
+                ).join('');
+            }
+        }
+    });
+}
+
 getRedirectResult(auth).then(async (result) => {
     if (result && result.user) {
         const userRef = doc(db, "users", result.user.uid);
@@ -30,7 +108,9 @@ getRedirectResult(auth).then(async (result) => {
             await updateDoc(userRef, { email: result.user.email, displayName: result.user.displayName });
         }
     }
-}).catch(() => {});
+}).catch(() => {}).then(() => {
+    initApp();
+});
 
 const langData = {
     fr: { title: "Connexion", google: "Continuer avec Google", loyalty: "Ma Fidélité", gift: "🎁 Coupe offerte !", logout: "Déconnexion", qr: "Présentez ce code au salon :", next: "Prochain RDV", navHome: "Accueil", navBooking: "Rendez-vous", navProfile: "Profil", navHistory: "Visites", profileTitle: "Mon Profil", langLabel: "Changer la langue :", phEmail: "Email", phPassword: "Mot de passe", phUsername: "Nom/Pseudo", login: "Se connecter", signup: "Inscription", signupToggle: "Vous n'avez pas de compte ? S'inscrire", historyTitle: "Historique des visites", noHistory: "Aucune visite enregistrée.", emailInvalid: "L'adresse email n'est pas valide.", emailUsed: "Cet email est déjà utilisé.", passTooWeak: "Mot de passe trop faible (min 6)", visitOn: "Visite du", settingsTitle: "Paramètres du compte", displayNameLabel: "Nom affiché", emailLabel: "Email", saveProfile: "Enregistrer", profileUpdated: "Profil mis à jour.", nameRequired: "Le nom est requis.", resetOnDate: "Les points seront réinitialisés le %s (%s).", week: "semaine", weeks: "semaines", day: "jour", days: "jours", and: " et " },
@@ -63,88 +143,6 @@ function updateLanguage(lang) {
 
     localStorage.setItem('userLang', lang);
 }
-
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        document.getElementById('login-section').style.display = 'none';
-        document.getElementById('client-section').style.display = 'flex'; 
-
-        const homeTab = document.getElementById('tab-home');
-        homeTab.style.display = 'flex';
-        homeTab.style.opacity = '1'; 
-        
-        const displayName = user.displayName || user.email.split('@')[0];
-        const profileNameInput = document.getElementById('profile-display-name');
-        const emailDisplay = document.getElementById('user-email-display');
-        if (profileNameInput) profileNameInput.value = displayName;
-        if (emailDisplay) emailDisplay.innerText = user.email || '';
-
-        onSnapshot(doc(db, "users", user.uid), async (snap) => {
-            if (snap.exists()) {
-                const data = snap.data();
-                const currentLang = localStorage.getItem('userLang') || 'sr';
-                const t = langData[currentLang] || langData.sr;
-                if (document.getElementById('profile-display-name') && data.displayName !== undefined)
-                    document.getElementById('profile-display-name').value = data.displayName;
-
-                const periodEnd = data.periodEndDate ? new Date(data.periodEndDate) : null;
-                const now = new Date();
-                if (periodEnd && periodEnd <= now && data.points > 0) {
-                    await updateDoc(doc(db, "users", user.uid), { points: 0, history: [], periodEndDate: null });
-                    return;
-                }
-                
-                document.getElementById('points-display').innerText = `${data.points} / 5`;
-                if(document.getElementById('progress-bar')) document.getElementById('progress-bar').style.width = (data.points / 5 * 100) + "%";
-                
-                const gift = document.getElementById('gift-msg');
-                gift.style.display = data.points >= 5 ? 'block' : 'none';
-                gift.innerText = t.gift;
-
-                const countdownCard = document.getElementById('countdown-card');
-                const countdownText = document.getElementById('countdown-text');
-                if (periodEnd && periodEnd > now && data.points > 0 && countdownCard && countdownText && t.resetOnDate) {
-                    const locale = currentLang === 'fr' ? 'fr-FR' : currentLang === 'sr' ? 'sr-RS' : 'en-US';
-                    const dateStr = periodEnd.toLocaleDateString(locale, { day: 'numeric', month: 'long' });
-                    const msLeft = periodEnd - now;
-                    const daysLeft = Math.ceil(msLeft / (24 * 60 * 60 * 1000));
-                    const weeks = Math.floor(daysLeft / 7);
-                    const wLabel = weeks === 1 ? t.week : t.weeks;
-                    const dLabel = daysLeft === 1 ? t.day : t.days;
-                    const paren = daysLeft >= 7 ? `${weeks} ${wLabel}` : `${daysLeft} ${dLabel}`;
-                    const parts = t.resetOnDate.split('%s');
-                    countdownText.innerText = (parts[0] || '') + dateStr + (parts[1] || '') + paren + (parts[2] || '');
-                    countdownCard.style.display = "block";
-                } else if (countdownCard) {
-                    countdownCard.style.display = "none";
-                }
-
-                const qrEl = document.getElementById('qrcode');
-                if (qrEl) {
-                    qrEl.innerHTML = "";
-                    if (typeof QRCode !== 'undefined') {
-                        new QRCode(qrEl, { text: user.uid, width: 140, height: 140, colorDark: '#1A1A1A' });
-                    }
-                }
-
-                const histDiv = document.getElementById('visit-history-client');
-                const history = data.history || [];
-                if (histDiv) {
-                    if (history.length === 0) {
-                        histDiv.innerHTML = `<p style="text-align:center; color: var(--secondary);">${t.noHistory}</p>`;
-                    } else {
-                        histDiv.innerHTML = history.slice().reverse().map(date => 
-                            `<div class="history-item-client"><span>${t.visitOn}</span>${date}</div>`
-                        ).join('');
-                    }
-                }
-            }
-        });
-    } else {
-        document.getElementById('login-section').style.display = 'block';
-        document.getElementById('client-section').style.display = 'none';
-    }
-});
 
 document.addEventListener('DOMContentLoaded', () => {
     const savedLang = localStorage.getItem('userLang') || 'sr';
