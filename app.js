@@ -141,8 +141,42 @@ async function applyRedirectResult(result) {
     return true;
 }
 
+// Detecte Safari sur iOS (utile pour afficher des conseils spécifiques)
+function isSafariIOS() {
+    const ua = navigator.userAgent || '';
+    return /iP(hone|od|ad)/.test(ua) && /Safari/.test(ua) && !(/CriOS|FxiOS|OPiOS|Chrome|Chromium|Edg\//.test(ua));
+}
+
+function showMobileRedirectHelp() {
+    if (document.getElementById('mobile-help')) return;
+    const loginSection = document.getElementById('login-section');
+    const div = document.createElement('div');
+    div.id = 'mobile-help';
+    div.style = 'background:#fff3cd;border:1px solid #ffeeba;padding:12px;margin:12px;border-radius:8px;color:#856404;';
+    div.innerHTML = `<strong>Problème de connexion sur Safari iOS</strong>
+        <p>Safari peut bloquer les cookies nécessaires au retour OAuth. Essayez :</p>
+        <ul style="margin:6px 0 8px 18px;">
+            <li>Désactiver <em>Prevent Cross‑Site Tracking</em> dans Réglages → Safari</li>
+            <li>Ouvrir ce site dans Chrome mobile</li>
+        </ul>
+        <div style="display:flex;gap:8px;">
+            <button id="mobile-help-retry" class="primary-btn">Réessayer la connexion</button>
+            <button id="mobile-help-openchrome" class="secondary-btn">Ouvrir dans Chrome</button>
+        </div>`;
+    if (loginSection) loginSection.insertBefore(div, loginSection.firstChild);
+    const retryBtn = document.getElementById('mobile-help-retry');
+    retryBtn.onclick = () => { const el = document.getElementById('btn-google'); if (el) el.click(); };
+    const chromeBtn = document.getElementById('mobile-help-openchrome');
+    chromeBtn.onclick = () => {
+        const url = window.location.href;
+        // Essayez d'ouvrir dans Chrome via le scheme (si Chrome installé), sinon ouvre l'URL normale
+        try { window.location.href = url.replace(/^https?:\/\//, 'googlechrome://'); } catch (e) { /* ignore */ }
+        setTimeout(() => { window.open(url, '_blank'); }, 600);
+    };
+}
+
 if (DEBUG) debug('app.js chargé, getRedirectResult démarré');
-const REDIRECT_RETRY_DELAYS = [500, 1200, 2500];
+const REDIRECT_RETRY_DELAYS = [500, 1200, 2500, 5000];
 function tryGetRedirectResult(attempt) {
     getRedirectResult(auth).then(async (result) => {
         if (DEBUG) debug('getRedirectResult (tentative ' + (attempt + 1) + '): result=' + (result && result.user ? result.user.uid : 'null'));
@@ -159,6 +193,9 @@ function tryGetRedirectResult(attempt) {
             if (panelEl) {
                 panelEl.appendChild(document.createElement('div')).textContent = '[⚠️] Redirection mobile non appliquée — essayer avec Chrome mobile ou vérifier les paramètres de cookies / domaines autorisés.';
             }
+            // Affiche un message d'aide visible sur mobile (bannière + bouton Réessayer)
+            try { showMobileRedirectHelp(); } catch (e) { if (DEBUG) debug('Erreur showMobileRedirectHelp: ' + (e && e.message ? e.message : e), 'err'); }
+            if (isSafariIOS()) { if (DEBUG) debug('iOS Safari détecté — afficher conseils spécifiques', 'ok'); }
         }
     }).catch((err) => {
         if (DEBUG) debug('getRedirectResult ERREUR: ' + (err && err.message ? err.message : String(err)), 'err');
