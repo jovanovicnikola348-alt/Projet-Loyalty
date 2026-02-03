@@ -18,7 +18,7 @@ const db = getFirestore(app);
 // Si tu veux utiliser le fallback Google Identity Services (GSI) pour Safari iOS,
 // renseigne ici ton client ID OAuth2 (type "Web application") créé dans Google Cloud Console.
 // Ex: const GOOGLE_CLIENT_ID = '1234-abc.apps.googleusercontent.com';
-const GOOGLE_CLIENT_ID = '278677354794-c4qm7sj04hevk458s1nlnuas7gbtveng.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '645134286018-kgkl7kh851c162jkoa325v72oi57v96v.apps.googleusercontent.com';
 
 function loadGsiScript() {
     return new Promise((resolve, reject) => {
