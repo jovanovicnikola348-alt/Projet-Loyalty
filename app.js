@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -15,9 +15,26 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+function isMobileOrWebView() {
+    const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(ua);
+}
+
+getRedirectResult(auth).then(async (result) => {
+    if (result && result.user) {
+        const userRef = doc(db, "users", result.user.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+            await setDoc(userRef, { email: result.user.email, displayName: result.user.displayName, points: 0, history: [] });
+        } else {
+            await updateDoc(userRef, { email: result.user.email, displayName: result.user.displayName });
+        }
+    }
+}).catch(() => {});
+
 const langData = {
     fr: { title: "Connexion", google: "Continuer avec Google", loyalty: "Ma Fidélité", gift: "🎁 Coupe offerte !", logout: "Déconnexion", qr: "Présentez ce code au salon :", next: "Prochain RDV", navHome: "Accueil", navBooking: "Rendez-vous", navProfile: "Profil", navHistory: "Visites", profileTitle: "Mon Profil", langLabel: "Changer la langue :", phEmail: "Email", phPassword: "Mot de passe", phUsername: "Nom/Pseudo", login: "Se connecter", signup: "Inscription", signupToggle: "Vous n'avez pas de compte ? S'inscrire", historyTitle: "Historique des visites", noHistory: "Aucune visite enregistrée.", emailInvalid: "L'adresse email n'est pas valide.", emailUsed: "Cet email est déjà utilisé.", passTooWeak: "Mot de passe trop faible (min 6)", visitOn: "Visite du", settingsTitle: "Paramètres du compte", displayNameLabel: "Nom affiché", emailLabel: "Email", saveProfile: "Enregistrer", profileUpdated: "Profil mis à jour.", nameRequired: "Le nom est requis.", resetOnDate: "Les points seront réinitialisés le %s (%s).", week: "semaine", weeks: "semaines", day: "jour", days: "jours", and: " et " },
-    sr: { title: "Prijava", google: "Nastavi sa Google-om", loyalty: "Moja lojalnost", gift: "🎁 Besplatno šišanje !", logout: "Odjavi se", qr: "Pokažite ovaj kod u salonu :", next: "Sledeći termin", navHome: "Početna", navBooking: "Termini", navProfile: "Profil", navHistory: "Posete", profileTitle: "Moj Profil", langLabel: "Promeni jezik :", phEmail: "Email", phPassword: "Lozinka", phUsername: "Ime/Nadimak", login: "Prijavi se", signup: "Registracija", signupToggle: "Nemate nalog? Registracija", historyTitle: "Istorija poseta", noHistory: "Nema zabeleženih poseta.", emailInvalid: "Neispravna adresa e-pošte.", emailUsed: "Ovaj e-mail je već u upotrebi.", passTooWeak: "Lozinka je preslaba (min 6)", visitOn: "Poseta dana", settingsTitle: "Podešavanja naloga", displayNameLabel: "Prikazano ime", emailLabel: "Email", saveProfile: "Sačuvaj", profileUpdated: "Profil ažuriran.", nameRequired: "Ime je obavezno.", countdownPrefix: "Preostalo ti je još ", countdownSuffix: " do resetovanja poena.", week: "nedelja", weeks: "nedelja", day: "dan", days: "dana", and: " i " },
+    sr: { title: "Prijava", google: "Nastavi sa Google-om", loyalty: "Moja lojalnost", gift: "🎁 Besplatno šišanje !", logout: "Odjavi se", qr: "Pokažite ovaj kod u salonu :", next: "Sledeći termin", navHome: "Početna", navBooking: "Termini", navProfile: "Profil", navHistory: "Posete", profileTitle: "Moj Profil", langLabel: "Promeni jezik :", phEmail: "Email", phPassword: "Lozinka", phUsername: "Ime/Nadimak", login: "Prijavi se", signup: "Registracija", signupToggle: "Nemate nalog? Registracija", historyTitle: "Istorija poseta", noHistory: "Nema zabeleženih poseta.", emailInvalid: "Neispravna adresa e-pošte.", emailUsed: "Ovaj e-mail je već u upotrebi.", passTooWeak: "Lozinka je preslaba (min 6)", visitOn: "Poseta dana", settingsTitle: "Podešavanja naloga", displayNameLabel: "Prikazano ime", emailLabel: "Email", saveProfile: "Sačuvaj", profileUpdated: "Profil ažuriran.", nameRequired: "Ime je obavezno.", resetOnDate: "Poeni će se resetovati %s (%s).", week: "nedelja", weeks: "nedelja", day: "dan", days: "dana", and: " i " },
     en: { title: "Login", google: "Continue with Google", loyalty: "My Loyalty", gift: "🎁 Free Haircut !", logout: "Logout", qr: "Show this code at the salon:", next: "Next Appointment", navHome: "Home", navBooking: "Booking", navProfile: "Profile", navHistory: "History", profileTitle: "My Profile", langLabel: "Change Language :", phEmail: "Email", phPassword: "Password", phUsername: "Name/Nickname", login: "Login", signup: "Signup", signupToggle: "Don't have an account? Sign up", historyTitle: "Visit History", noHistory: "No recorded visits.", emailInvalid: "Invalid email address.", emailUsed: "This email is already in use.", passTooWeak: "Password too weak (min 6)", visitOn: "Visit on", settingsTitle: "Account settings", displayNameLabel: "Display name", emailLabel: "Email", saveProfile: "Save", profileUpdated: "Profile updated.", nameRequired: "Name is required.", resetOnDate: "Points will reset on %s (%s).", week: "week", weeks: "weeks", day: "day", days: "days", and: " and " }
 };
 
@@ -86,7 +103,7 @@ onAuthStateChanged(auth, async (user) => {
 
                 const countdownCard = document.getElementById('countdown-card');
                 const countdownText = document.getElementById('countdown-text');
-                if (periodEnd && periodEnd > now && data.points > 0) {
+                if (periodEnd && periodEnd > now && data.points > 0 && countdownCard && countdownText && t.resetOnDate) {
                     const locale = currentLang === 'fr' ? 'fr-FR' : currentLang === 'sr' ? 'sr-RS' : 'en-US';
                     const dateStr = periodEnd.toLocaleDateString(locale, { day: 'numeric', month: 'long' });
                     const msLeft = periodEnd - now;
@@ -98,12 +115,17 @@ onAuthStateChanged(auth, async (user) => {
                     const parts = t.resetOnDate.split('%s');
                     countdownText.innerText = (parts[0] || '') + dateStr + (parts[1] || '') + paren + (parts[2] || '');
                     countdownCard.style.display = "block";
-                } else {
+                } else if (countdownCard) {
                     countdownCard.style.display = "none";
                 }
 
-                document.getElementById('qrcode').innerHTML = "";
-                new QRCode(document.getElementById('qrcode'), { text: user.uid, width: 140, height: 140, colorDark: '#1A1A1A' });
+                const qrEl = document.getElementById('qrcode');
+                if (qrEl) {
+                    qrEl.innerHTML = "";
+                    if (typeof QRCode !== 'undefined') {
+                        new QRCode(qrEl, { text: user.uid, width: 140, height: 140, colorDark: '#1A1A1A' });
+                    }
+                }
 
                 const histDiv = document.getElementById('visit-history-client');
                 const history = data.history || [];
@@ -159,13 +181,26 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.getElementById('btn-google').onclick = async () => {
-    const res = await signInWithPopup(auth, new GoogleAuthProvider());
-    const userRef = doc(db, "users", res.user.uid);
-    const userSnap = await getDoc(userRef);
-    if (!userSnap.exists()) {
-        setDoc(userRef, { email: res.user.email, displayName: res.user.displayName, points: 0, history: [] });
-    } else {
-        updateDoc(userRef, { email: res.user.email, displayName: res.user.displayName });
+    const provider = new GoogleAuthProvider();
+    if (isMobileOrWebView()) {
+        await signInWithRedirect(auth, provider);
+        return;
+    }
+    try {
+        const res = await signInWithPopup(auth, provider);
+        const userRef = doc(db, "users", res.user.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+            await setDoc(userRef, { email: res.user.email, displayName: res.user.displayName, points: 0, history: [] });
+        } else {
+            await updateDoc(userRef, { email: res.user.email, displayName: res.user.displayName });
+        }
+    } catch (err) {
+        if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request' || (err.message && err.message.includes('disallowed_useragent'))) {
+            await signInWithRedirect(auth, provider);
+        } else {
+            throw err;
+        }
     }
 };
 document.getElementById('btn-login').onclick = () => signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value);
