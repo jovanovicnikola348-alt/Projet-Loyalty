@@ -108,9 +108,7 @@ getRedirectResult(auth).then(async (result) => {
             await updateDoc(userRef, { email: result.user.email, displayName: result.user.displayName });
         }
     }
-}).catch(() => {}).then(() => {
-    initApp();
-});
+}).catch(() => {});
 
 const langData = {
     fr: { title: "Connexion", google: "Continuer avec Google", loyalty: "Ma Fidélité", gift: "🎁 Coupe offerte !", logout: "Déconnexion", qr: "Présentez ce code au salon :", next: "Prochain RDV", navHome: "Accueil", navBooking: "Rendez-vous", navProfile: "Profil", navHistory: "Visites", profileTitle: "Mon Profil", langLabel: "Changer la langue :", phEmail: "Email", phPassword: "Mot de passe", phUsername: "Nom/Pseudo", login: "Se connecter", signup: "Inscription", signupToggle: "Vous n'avez pas de compte ? S'inscrire", historyTitle: "Historique des visites", noHistory: "Aucune visite enregistrée.", emailInvalid: "L'adresse email n'est pas valide.", emailUsed: "Cet email est déjà utilisé.", passTooWeak: "Mot de passe trop faible (min 6)", visitOn: "Visite du", settingsTitle: "Paramètres du compte", displayNameLabel: "Nom affiché", emailLabel: "Email", saveProfile: "Enregistrer", profileUpdated: "Profil mis à jour.", nameRequired: "Le nom est requis.", resetOnDate: "Les points seront réinitialisés le %s (%s).", week: "semaine", weeks: "semaines", day: "jour", days: "jours", and: " et " },
@@ -145,6 +143,7 @@ function updateLanguage(lang) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    initApp();
     const savedLang = localStorage.getItem('userLang') || 'sr';
     updateLanguage(savedLang);
 
