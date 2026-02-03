@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (change > 0) {
                 updates.history = arrayUnion(getNiceDate());
                 if (currentData.points === 0) {
-                    const endDate = new Date(Date.now() + 35 * 24 * 60 * 60 * 1000);
+                    const endDate = new Date(Date.now() + 33 * 24 * 60 * 60 * 1000);
                     updates.periodEndDate = endDate.toISOString();
                 }
             }

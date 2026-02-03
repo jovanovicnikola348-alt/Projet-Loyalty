@@ -100,17 +100,12 @@ function debug(msg, type = 'info') {
     }
 }
 
-// CONFIG : durée avant reset à partir du premier point (en mois)
-const RESET_MONTHS = 6; // change si tu veux 3, 12, etc.
+// CONFIG : durée avant reset à partir du premier point (en jours)
+const RESET_DAYS = 33; // *toujours* 33 jours selon demande
 
-function addMonths(date, months) {
+function addDays(date, days) {
     const d = new Date(date);
-    const day = d.getDate();
-    d.setMonth(d.getMonth() + months);
-    // handle month overflow
-    if (d.getDate() !== day) {
-        d.setDate(0);
-    }
+    d.setDate(d.getDate() + days);
     return d;
 }
 
@@ -170,20 +165,35 @@ function setupUserSnapshot(user) {
         // ----- Ensure firstPointDate + periodEndDate exists for users with points (migration & new behavior)
         try {
             if (data.points > 0 && !data.firstPointDate) {
-                // Try to infer firstPointDate from history if present
+                // Prefer to compute firstPointDate only if we can infer it reliably
                 let inferred = null;
-                if (Array.isArray(data.history) && data.history.length > 0) {
+
+                // If periodEndDate exists and is valid, derive firstPointDate from it
+                if (data.periodEndDate) {
+                    const pe = new Date(data.periodEndDate);
+                    if (!isNaN(pe.getTime())) {
+                        inferred = new Date(pe.getTime() - RESET_DAYS * 24 * 60 * 60 * 1000);
+                        if (DEBUG) debug('Inferred firstPointDate from existing periodEndDate for uid=' + user.uid, 'ok');
+                    }
+                }
+
+                // Else, try to parse any history entries that are valid dates
+                if (!inferred && Array.isArray(data.history) && data.history.length > 0) {
                     try {
                         const times = data.history.map(h => new Date(h).getTime()).filter(t => !isNaN(t));
                         if (times.length > 0) inferred = new Date(Math.min(...times));
+                        if (inferred && DEBUG) debug('Inferred firstPointDate from history for uid=' + user.uid, 'ok');
                     } catch (e) { if (DEBUG) debug('infer history date failed: ' + (e && e.message ? e.message : e), 'err'); }
                 }
-                if (!inferred) inferred = new Date();
-                const periodEnd = addMonths(inferred, RESET_MONTHS);
-                await updateDoc(doc(db, "users", user.uid), { firstPointDate: inferred.toISOString(), periodEndDate: periodEnd.toISOString() });
-                if (DEBUG) debug('Set firstPointDate & periodEndDate from snapshot for uid=' + user.uid, 'ok');
-                // Refresh local data object by refetching snap
-                // Note: subsequent onSnapshot call will send updated data
+
+                // Only set values if we have a reliable inferred date
+                if (inferred) {
+                    const periodEnd = addDays(inferred, RESET_DAYS);
+                    await updateDoc(doc(db, "users", user.uid), { firstPointDate: inferred.toISOString(), periodEndDate: periodEnd.toISOString() });
+                    if (DEBUG) debug('Set firstPointDate & periodEndDate from snapshot for uid=' + user.uid, 'ok');
+                } else {
+                    if (DEBUG) debug('Unable to infer firstPointDate for uid=' + user.uid + ' — skipping auto-set to avoid wrong dates', 'info');
+                }
             }
         } catch (e) {
             if (DEBUG) debug('Erreur ensureFirstPointDate: ' + (e && e.message ? e.message : e), 'err');
@@ -194,15 +204,27 @@ function setupUserSnapshot(user) {
         if (document.getElementById('profile-display-name') && data.displayName !== undefined)
             document.getElementById('profile-display-name').value = data.displayName;
 
-        // Show first point date in UI if present
-        const firstPointEl = document.getElementById('first-point-display');
-        const firstPointContainer = document.getElementById('first-point-date');
-        if (data.firstPointDate) {
-            if (firstPointEl) firstPointEl.innerText = formatDateForDisplay(data.firstPointDate);
-            if (firstPointContainer) firstPointContainer.style.display = 'block';
-        } else {
-            if (firstPointContainer) firstPointContainer.style.display = 'none';
+        // Ensure periodEndDate aligns with RESET_DAYS from firstPointDate if available
+        try {
+            if (data.points > 0 && data.firstPointDate) {
+                const fp = new Date(data.firstPointDate);
+                if (!isNaN(fp.getTime())) {
+                    const expectedEnd = addDays(fp, RESET_DAYS);
+                    const currentEnd = data.periodEndDate ? new Date(data.periodEndDate) : null;
+                    const diff = currentEnd ? Math.abs(currentEnd.getTime() - expectedEnd.getTime()) : Infinity;
+                    // If periodEndDate missing or differs by more than 1 minute, normalize it
+                    if (!currentEnd || diff > 60 * 1000) {
+                        await updateDoc(doc(db, "users", user.uid), { periodEndDate: expectedEnd.toISOString() });
+                        if (DEBUG) debug('Normalized periodEndDate to ' + expectedEnd.toISOString() + ' for uid=' + user.uid, 'ok');
+                    }
+                }
+            }
+        } catch (e) {
+            if (DEBUG) debug('Erreur normalize periodEndDate: ' + (e && e.message ? e.message : e), 'err');
         }
+
+        // We intentionally do NOT display 'Premier point' in the UI to avoid confusion.
+        // The period end countdown remains shown based on periodEndDate.
 
         const periodEnd = data.periodEndDate ? new Date(data.periodEndDate) : null;
         const now = new Date();
