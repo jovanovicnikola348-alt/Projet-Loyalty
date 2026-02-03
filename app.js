@@ -40,17 +40,27 @@ async function setupGsiButton() {
     try {
         await loadGsiScript();
         if (DEBUG) debug('GSI script chargé');
+        // Si le container existe, on ne réinitialise pas
         if (document.getElementById('gsi-container')) return;
         const btn = document.getElementById('btn-google');
         const container = document.createElement('div'); container.id = 'gsi-container';
+        // Placer le container à la place du bouton original pour éviter les doublons
+        if (btn && btn.parentNode) {
+            btn.parentNode.insertBefore(container, btn);
+            btn.style.display = 'none'; // masquer le bouton fallback
+        } else {
+            if (btn && btn.parentNode) btn.parentNode.insertBefore(container, btn.nextSibling);
+        }
         container.style = 'display:flex;justify-content:center;margin-top:8px;';
-        if (btn && btn.parentNode) btn.parentNode.insertBefore(container, btn.nextSibling);
         google.accounts.id.initialize({
             client_id: GOOGLE_CLIENT_ID,
             callback: handleGsiCredentialResponse,
             ux_mode: 'popup'
         });
+        // Render dans le container (apparence moderne GSI)
         google.accounts.id.renderButton(container, { theme: 'outline', size: 'large', shape: 'rectangular', text: 'signin_with' });
+        // Si une aide mobile était affichée, la retirer car GSI est disponible
+        const mh = document.getElementById('mobile-help'); if (mh && mh.parentNode) mh.parentNode.removeChild(mh);
     } catch (err) {
         if (DEBUG) debug('Erreur chargement GSI: ' + (err && err.message ? err.message : err), 'err');
     }
@@ -254,9 +264,16 @@ function tryGetRedirectResult(attempt) {
             if (panelEl) {
                 panelEl.appendChild(document.createElement('div')).textContent = '[⚠️] Redirection mobile non appliquée — essayer avec Chrome mobile ou vérifier les paramètres de cookies / domaines autorisés.';
             }
-            // Affiche un message d'aide visible sur mobile (bannière + bouton Réessayer)
-            try { showMobileRedirectHelp(); } catch (e) { if (DEBUG) debug('Erreur showMobileRedirectHelp: ' + (e && e.message ? e.message : e), 'err'); }
-            if (isSafariIOS()) { if (DEBUG) debug('iOS Safari détecté — afficher conseils spécifiques', 'ok'); }
+            // Si GSI est disponible, proposer le fallback GSI plutôt que la bannière d'aide
+            if (GOOGLE_CLIENT_ID && isSafariIOS()) {
+                if (DEBUG) debug('GSI disponible — afficher bouton GSI et masquer l’aide.', 'ok');
+                try { await setupGsiButton(); } catch (e) { if (DEBUG) debug('Erreur setupGsiButton: ' + (e && e.message ? e.message : e), 'err'); }
+                const panelEl2 = document.getElementById('debug-log'); if (panelEl2) panelEl2.appendChild(document.createElement('div')).textContent = '[ℹ️] Essayez le bouton Google en haut (GSI) sur Safari iOS.';
+            } else {
+                // Affiche un message d'aide visible sur mobile (bannière + bouton Réessayer)
+                try { showMobileRedirectHelp(); } catch (e) { if (DEBUG) debug('Erreur showMobileRedirectHelp: ' + (e && e.message ? e.message : e), 'err'); }
+                if (isSafariIOS()) { if (DEBUG) debug('iOS Safari détecté — afficher conseils spécifiques', 'ok'); }
+            }
         }
     }).catch((err) => {
         if (DEBUG) debug('getRedirectResult ERREUR: ' + (err && err.message ? err.message : String(err)), 'err');
@@ -306,11 +323,17 @@ document.addEventListener('DOMContentLoaded', () => {
         debug('DOMContentLoaded, userAgent=' + (navigator.userAgent || '').substring(0, 60));
         debug('Mobile/WebView=' + isMobileOrWebView());
         // Added logs to help debug redirect results on mobile/Safari
-        debug('location.href=' + (location.href || '')); 
+        debug('location.href=' + (location.href || ''));
         debug('location.search=' + (location.search || '') + ' location.hash=' + (location.hash || ''));
         debug('document.referrer=' + (document.referrer || ''));
         const closeBtn = document.getElementById('debug-close');
         if (closeBtn) closeBtn.onclick = () => { if (panel) panel.style.display = 'none'; };
+    }
+
+    // If on iOS Safari and GSI client is configured, proactively render the modern button
+    if (isSafariIOS() && GOOGLE_CLIENT_ID) {
+        if (DEBUG) debug('iOS Safari & GSI configured — rendering modern Google button on load');
+        try { setupGsiButton(); } catch(e) { if (DEBUG) debug('setupGsiButton on load failed: ' + (e && e.message ? e.message : e), 'err'); }
     }
     initApp();
     const savedLang = localStorage.getItem('userLang') || 'sr';
@@ -355,8 +378,11 @@ document.getElementById('btn-google').onclick = async () => {
         if (GOOGLE_CLIENT_ID) {
             if (DEBUG) debug('iOS Safari détecté - utiliser GSI fallback');
             await setupGsiButton();
-            // Simuler un clic sur le bouton GSI si présent
-            const gsiBtn = document.querySelector('#gsi-container button');
+            // Essayer d'ouvrir la prompt GSI si disponible, sinon simuler un clic sur le bouton rendu
+            if (window.google && google.accounts && google.accounts.id && typeof google.accounts.id.prompt === 'function') {
+                try { google.accounts.id.prompt(); return; } catch(e) { if (DEBUG) debug('google.accounts.id.prompt failed: ' + e, 'err'); }
+            }
+            const gsiBtn = document.querySelector('#gsi-container button, #gsi-container [role="button"]');
             if (gsiBtn) { gsiBtn.click(); return; }
             // sinon afficher l'aide et laisser l'utilisateur réessayer manuellement
             showMobileRedirectHelp();
