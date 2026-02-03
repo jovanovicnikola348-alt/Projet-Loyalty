@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, setPersistence, browserSessionPersistence, browserLocalPersistence, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, setPersistence, browserSessionPersistence, browserLocalPersistence, updateProfile, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -14,6 +14,67 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Si tu veux utiliser le fallback Google Identity Services (GSI) pour Safari iOS,
+// renseigne ici ton client ID OAuth2 (type "Web application") créé dans Google Cloud Console.
+// Ex: const GOOGLE_CLIENT_ID = '1234-abc.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '';
+
+function loadGsiScript() {
+    return new Promise((resolve, reject) => {
+        if (window.google && window.google.accounts && window.google.accounts.id) return resolve();
+        const s = document.createElement('script');
+        s.src = 'https://accounts.google.com/gsi/client';
+        s.async = true; s.defer = true;
+        s.onload = () => { setTimeout(() => resolve(), 50); };
+        s.onerror = reject;
+        document.head.appendChild(s);
+    });
+}
+
+async function setupGsiButton() {
+    if (!GOOGLE_CLIENT_ID) {
+        if (DEBUG) debug('GSI client id non configuré; ignorer fallback GSI', 'err');
+        return;
+    }
+    try {
+        await loadGsiScript();
+        if (DEBUG) debug('GSI script chargé');
+        if (document.getElementById('gsi-container')) return;
+        const btn = document.getElementById('btn-google');
+        const container = document.createElement('div'); container.id = 'gsi-container';
+        container.style = 'display:flex;justify-content:center;margin-top:8px;';
+        if (btn && btn.parentNode) btn.parentNode.insertBefore(container, btn.nextSibling);
+        google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleGsiCredentialResponse,
+            ux_mode: 'popup'
+        });
+        google.accounts.id.renderButton(container, { theme: 'outline', size: 'large', shape: 'rectangular', text: 'signin_with' });
+    } catch (err) {
+        if (DEBUG) debug('Erreur chargement GSI: ' + (err && err.message ? err.message : err), 'err');
+    }
+}
+
+async function handleGsiCredentialResponse(resp) {
+    if (DEBUG) debug('GSI response received, credential=' + (resp && (resp.credential ? 'present' : 'none')));
+    if (!resp || !resp.credential) return;
+    try {
+        const credential = GoogleAuthProvider.credential(resp.credential);
+        const userCred = await signInWithCredential(auth, credential);
+        if (DEBUG) debug('GSI signInWithCredential OK uid=' + (userCred && userCred.user && userCred.user.uid));
+        const userRef = doc(db, "users", userCred.user.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) {
+            await setDoc(userRef, { email: userCred.user.email, displayName: userCred.user.displayName, points: 0, history: [] });
+        } else {
+            await updateDoc(userRef, { email: userCred.user.email, displayName: userCred.user.displayName });
+        }
+        showClientUI(userCred.user);
+    } catch (err) {
+        if (DEBUG) debug('GSI -> signInWithCredential ERREUR: ' + (err && err.message ? err.message : err), 'err');
+    }
+}
 
 const DEBUG = typeof window !== 'undefined' && /[?&]debug=1/.test(window.location.search);
 const debugLog = [];
@@ -288,6 +349,23 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('btn-google').onclick = async () => {
     if (DEBUG) debug('Clic Google, isMobile=' + isMobileOrWebView());
     const provider = new GoogleAuthProvider();
+
+    // Sur iOS Safari, tenter d'abord le fallback GSI si configuré
+    if (isSafariIOS()) {
+        if (GOOGLE_CLIENT_ID) {
+            if (DEBUG) debug('iOS Safari détecté - utiliser GSI fallback');
+            await setupGsiButton();
+            // Simuler un clic sur le bouton GSI si présent
+            const gsiBtn = document.querySelector('#gsi-container button');
+            if (gsiBtn) { gsiBtn.click(); return; }
+            // sinon afficher l'aide et laisser l'utilisateur réessayer manuellement
+            showMobileRedirectHelp();
+            return;
+        } else {
+            if (DEBUG) debug('iOS Safari détecté mais GSI client id non configuré; continuer avec redirect', 'err');
+        }
+    }
+
     if (isMobileOrWebView()) {
         if (DEBUG) debug('Persistance mobile: essayer session puis local, puis redirection Google...');
         try {
