@@ -18,7 +18,10 @@
 
         <!-- Vue Liste & Recherche -->
         <section id="admin-main" class="admin-section">
-            <button id="open-scanner" class="admin-btn admin-btn-primary">📷 <span id="open-scanner-text">Otvori skener</span></button>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <button id="open-scanner" class="admin-btn admin-btn-primary">📷 <span id="open-scanner-text">Otvori skener</span></button>
+                <button id="normalize-users" class="admin-btn admin-btn-secondary">🔧 Normaliser les dates</button>
+            </div>
             <div class="admin-search-wrap">
                 <input type="text" id="user-search" class="admin-search-input" placeholder="">
             </div>
@@ -46,6 +49,16 @@
                 <hr class="modal-divider">
                 <h3 id="modal-history-title" class="modal-section-title">Istorija poseta</h3>
                 <div id="visit-history" class="modal-history-list"></div>
+
+                <hr class="modal-divider">
+                <h3 class="modal-section-title">Dates</h3>
+                <p>Premier point : <span id="modal-first-point">—</span></p>
+                <p>Date reset : <span id="modal-period-end">—</span></p>
+                <div style="display:flex; gap:8px; margin-bottom:8px;">
+                    <button id="edit-dates-btn" class="admin-btn">Modifier les dates</button>
+                    <button id="recompute-from-history" class="admin-btn admin-btn-secondary">Recalculer depuis Historique</button>
+                </div>
+
                 <button type="button" id="delete-user-btn" class="admin-btn admin-btn-danger">🗑 <span id="delete-user-text">Obriši korisnika</span></button>
                 <button type="button" id="close-modal" class="admin-btn admin-btn-close">Zatvori</button>
             </div>

@@ -243,10 +243,22 @@ function setupUserSnapshot(user) {
         if (periodEnd && periodEnd > now && data.points > 0 && countdownCard && countdownText && t.resetOnDate) {
             const locale = currentLang === 'fr' ? 'fr-FR' : currentLang === 'sr' ? 'sr-RS' : 'en-US';
             const dateStr = periodEnd.toLocaleDateString(locale, { day: 'numeric', month: 'long' });
-            const msLeft = periodEnd - now;
-            const daysLeft = Math.ceil(msLeft / (24 * 60 * 60 * 1000));
-            const dLabel = daysLeft === 1 ? t.day : t.days;
-            const paren = `${daysLeft} ${dLabel}`; // always show days
+            const msDay = 24 * 60 * 60 * 1000;
+            let daysRemaining = Math.ceil((periodEnd - now) / msDay);
+
+            // Prefer inclusive calculation based on firstPointDate if present
+            if (data.firstPointDate) {
+                try {
+                    const fp = new Date(data.firstPointDate);
+                    const fpStart = new Date(fp.getFullYear(), fp.getMonth(), fp.getDate());
+                    const nowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const daysElapsedInclusive = Math.floor((nowStart - fpStart) / msDay) + 1;
+                    daysRemaining = Math.max(0, RESET_DAYS - daysElapsedInclusive);
+                } catch (e) { if (DEBUG) debug('Error computing inclusive days: ' + (e && e.message ? e.message : e), 'err'); }
+            }
+
+            const dLabel = daysRemaining === 1 ? t.day : t.days;
+            const paren = `${daysRemaining} ${dLabel}`;
             const parts = t.resetOnDate.split('%s');
             countdownText.innerText = (parts[0] || '') + dateStr + (parts[1] || '') + paren + (parts[2] || '');
             countdownCard.style.display = "block";
