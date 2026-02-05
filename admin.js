@@ -32,7 +32,15 @@ function getNiceDate() {
 }
 
 // --- NORMALIZATION CONFIG ---
-const RESET_DAYS = 33;
+const RESET_MONTHS = 2; // 2 months after first point
+
+function addMonths(date, months) {
+    const d = new Date(date);
+    const day = d.getDate();
+    d.setMonth(d.getMonth() + months);
+    if (d.getDate() !== day) d.setDate(0);
+    return d;
+}
 
 // Parse localized history entries (fr/sr) into ms since epoch (copied from app.js)
 function parseHistoryEntryToMillis(text) {
@@ -86,7 +94,7 @@ async function normalizeUserDates(user) {
         if (user.periodEndDate) {
             const pe = new Date(user.periodEndDate);
             if (!isNaN(pe.getTime())) {
-                inferred = new Date(pe.getTime() - RESET_DAYS * 24 * 60 * 60 * 1000);
+                inferred = addMonths(pe, -RESET_MONTHS);
             }
         }
         if (!inferred && Array.isArray(user.history) && user.history.length > 0) {
@@ -94,7 +102,7 @@ async function normalizeUserDates(user) {
             if (parsed.length > 0) inferred = new Date(Math.min(...parsed));
         }
         if (inferred && !user.firstPointDate) {
-            const periodEnd = new Date(inferred.getTime() + RESET_DAYS * 24 * 60 * 60 * 1000);
+            const periodEnd = addMonths(inferred, RESET_MONTHS);
             const userRef = doc(db, 'users', user.id);
             await updateDoc(userRef, { firstPointDate: inferred.toISOString(), periodEndDate: periodEnd.toISOString() });
             return { updated: true, firstPointDate: inferred.toISOString(), periodEndDate: periodEnd.toISOString() };
@@ -103,7 +111,7 @@ async function normalizeUserDates(user) {
         if (user.firstPointDate) {
             const fp = new Date(user.firstPointDate);
             if (!isNaN(fp.getTime())) {
-                const expectedEnd = new Date(fp.getTime() + RESET_DAYS * 24 * 60 * 60 * 1000);
+                const expectedEnd = addMonths(fp, RESET_MONTHS);
                 const currEnd = user.periodEndDate ? new Date(user.periodEndDate) : null;
                 const diff = currEnd ? Math.abs(currEnd.getTime() - expectedEnd.getTime()) : Infinity;
                 if (!currEnd || diff > 60*1000) {
@@ -185,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updates.history = arrayUnion(getNiceDate());
                 if (currentData.points === 0) {
                     const nowIso = new Date().toISOString();
-                    const endDate = new Date(Date.now() + 33 * 24 * 60 * 60 * 1000);
+                    const endDate = addMonths(new Date(), RESET_MONTHS);
                     updates.periodEndDate = endDate.toISOString();
                     updates.firstPointDate = nowIso; // set firstPointDate when first point is added
                 }
@@ -243,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const parsed = new Date(input);
         if (isNaN(parsed.getTime())) { alert('Date invalide'); return; }
         const fpIso = parsed.toISOString();
-        const periodEnd = new Date(parsed.getTime() + RESET_DAYS * 24 * 60 * 60 * 1000).toISOString();
+        const periodEnd = addMonths(parsed, RESET_MONTHS).toISOString();
         await updateDoc(userRef, { firstPointDate: fpIso, periodEndDate: periodEnd });
         alert('Dates mises à jour.');
         const newSnap = await getDoc(userRef);

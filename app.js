@@ -100,12 +100,17 @@ function debug(msg, type = 'info') {
     }
 }
 
-// CONFIG : durée avant reset à partir du premier point (en jours)
-const RESET_DAYS = 33; // *toujours* 33 jours selon demande
+// CONFIG : durée avant reset à partir du premier point (en mois)
+const RESET_MONTHS = 2; // 2 mois après le premier point
 
-function addDays(date, days) {
+function addMonths(date, months) {
     const d = new Date(date);
-    d.setDate(d.getDate() + days);
+    const day = d.getDate();
+    d.setMonth(d.getMonth() + months);
+    // handle month overflow
+    if (d.getDate() !== day) {
+        d.setDate(0);
+    }
     return d;
 }
 
@@ -172,7 +177,7 @@ function setupUserSnapshot(user) {
                 if (data.periodEndDate) {
                     const pe = new Date(data.periodEndDate);
                     if (!isNaN(pe.getTime())) {
-                        inferred = new Date(pe.getTime() - RESET_DAYS * 24 * 60 * 60 * 1000);
+                        inferred = addMonths(pe, -RESET_MONTHS);
                         if (DEBUG) debug('Inferred firstPointDate from existing periodEndDate for uid=' + user.uid, 'ok');
                     }
                 }
@@ -189,7 +194,7 @@ function setupUserSnapshot(user) {
 
                 // Only set values if we have a reliable inferred date
                 if (inferred) {
-                    const periodEnd = addDays(inferred, RESET_DAYS);
+                    const periodEnd = addMonths(inferred, RESET_MONTHS);
                     await updateDoc(doc(db, "users", user.uid), { firstPointDate: inferred.toISOString(), periodEndDate: periodEnd.toISOString() });
                     if (DEBUG) debug('Set firstPointDate & periodEndDate from snapshot for uid=' + user.uid, 'ok');
                 } else {
@@ -205,12 +210,12 @@ function setupUserSnapshot(user) {
         if (document.getElementById('profile-display-name') && data.displayName !== undefined)
             document.getElementById('profile-display-name').value = data.displayName;
 
-        // Ensure periodEndDate aligns with RESET_DAYS from firstPointDate if available
+        // Ensure periodEndDate aligns with RESET_MONTHS from firstPointDate if available
         try {
             if (data.points > 0 && data.firstPointDate) {
                 const fp = new Date(data.firstPointDate);
                 if (!isNaN(fp.getTime())) {
-                    const expectedEnd = addDays(fp, RESET_DAYS);
+                    const expectedEnd = addMonths(fp, RESET_MONTHS);
                     const currentEnd = data.periodEndDate ? new Date(data.periodEndDate) : null;
                     const diff = currentEnd ? Math.abs(currentEnd.getTime() - expectedEnd.getTime()) : Infinity;
                     // If periodEndDate missing or differs by more than 1 minute, normalize it
@@ -246,14 +251,14 @@ function setupUserSnapshot(user) {
             const msDay = 24 * 60 * 60 * 1000;
             let daysRemaining = Math.ceil((periodEnd - now) / msDay);
 
-            // Prefer inclusive calculation based on firstPointDate if present
+            // If firstPointDate present, compute expected end by adding months and derive remaining days
             if (data.firstPointDate) {
                 try {
                     const fp = new Date(data.firstPointDate);
                     const fpStart = new Date(fp.getFullYear(), fp.getMonth(), fp.getDate());
                     const nowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    const daysElapsedInclusive = Math.floor((nowStart - fpStart) / msDay) + 1;
-                    daysRemaining = Math.max(0, RESET_DAYS - daysElapsedInclusive);
+                    const expectedEnd = addMonths(fpStart, RESET_MONTHS);
+                    daysRemaining = Math.max(0, Math.ceil((expectedEnd - nowStart) / msDay));
                 } catch (e) { if (DEBUG) debug('Error computing inclusive days: ' + (e && e.message ? e.message : e), 'err'); }
             }
 
