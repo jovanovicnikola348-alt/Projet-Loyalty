@@ -234,8 +234,13 @@ function setupUserSnapshot(user) {
 
         const periodEnd = data.periodEndDate ? new Date(data.periodEndDate) : null;
         const now = new Date();
-        if (periodEnd && periodEnd <= now && data.points > 0) {
-            await updateDoc(doc(db, "users", user.uid), { points: 0, history: [], periodEndDate: null });
+        // compute effective end date (from stored periodEnd or derived from firstPointDate)
+        let effectiveEnd = periodEnd;
+        if (!effectiveEnd && data.firstPointDate) {
+            try { effectiveEnd = addMonths(new Date(data.firstPointDate), RESET_MONTHS); } catch(e) { if (DEBUG) debug('Erreur compute effectiveEnd: ' + (e && e.message ? e.message : e), 'err'); }
+        }
+        if (effectiveEnd && effectiveEnd <= now && data.points > 0) {
+            await updateDoc(doc(db, "users", user.uid), { points: 0, history: [], periodEndDate: null, firstPointDate: null });
             return;
         }
         document.getElementById('points-display').innerText = `${data.points} / 5`;
@@ -245,28 +250,36 @@ function setupUserSnapshot(user) {
         gift.innerText = t.gift;
         const countdownCard = document.getElementById('countdown-card');
         const countdownText = document.getElementById('countdown-text');
-        if (periodEnd && periodEnd > now && data.points > 0 && countdownCard && countdownText && t.resetOnDate) {
+        // Show countdown based on a single expectedEnd (from firstPointDate or stored periodEnd)
+        if ((periodEnd || data.firstPointDate) && data.points > 0 && countdownCard && countdownText && t.resetOnDate) {
             const locale = currentLang === 'fr' ? 'fr-FR' : currentLang === 'sr' ? 'sr-RS' : 'en-US';
-            const dateStr = periodEnd.toLocaleDateString(locale, { day: 'numeric', month: 'long' });
             const msDay = 24 * 60 * 60 * 1000;
-            let daysRemaining = Math.ceil((periodEnd - now) / msDay);
+            const nowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-            // If firstPointDate present, compute expected end by adding months and derive remaining days
+            // compute expectedEnd
+            let expectedEnd = null;
             if (data.firstPointDate) {
                 try {
                     const fp = new Date(data.firstPointDate);
                     const fpStart = new Date(fp.getFullYear(), fp.getMonth(), fp.getDate());
-                    const nowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                    const expectedEnd = addMonths(fpStart, RESET_MONTHS);
-                    daysRemaining = Math.max(0, Math.ceil((expectedEnd - nowStart) / msDay));
-                } catch (e) { if (DEBUG) debug('Error computing inclusive days: ' + (e && e.message ? e.message : e), 'err'); }
+                    expectedEnd = addMonths(fpStart, RESET_MONTHS);
+                } catch (e) { if (DEBUG) debug('Error computing expectedEnd from firstPointDate: ' + (e && e.message ? e.message : e), 'err'); }
             }
+            if (!expectedEnd && periodEnd) expectedEnd = periodEnd;
 
-            const dLabel = daysRemaining === 1 ? t.day : t.days;
-            const paren = `${daysRemaining} ${dLabel}`;
-            const parts = t.resetOnDate.split('%s');
-            countdownText.innerText = (parts[0] || '') + dateStr + (parts[1] || '') + paren + (parts[2] || '');
-            countdownCard.style.display = "block";
+            if (expectedEnd && expectedEnd > nowStart) {
+                const dateStr = expectedEnd.toLocaleDateString(locale, { day: 'numeric', month: 'long' });
+                const daysRemaining = Math.max(0, Math.ceil((expectedEnd - nowStart) / msDay));
+                const dLabel = daysRemaining === 1 ? t.day : t.days;
+                const paren = `${daysRemaining} ${dLabel}`;
+                const parts = t.resetOnDate.split('%s');
+                countdownText.innerText = (parts[0] || '') + dateStr + (parts[1] || '') + paren + (parts[2] || '');
+                countdownCard.style.display = "block";
+                if (DEBUG) debug('Countdown: firstPointDate=' + (data.firstPointDate||'null') + ' storedPeriodEnd=' + (data.periodEndDate||'null') + ' expectedEnd=' + expectedEnd.toISOString() + ' daysRemaining=' + daysRemaining, 'ok');
+            } else {
+                countdownCard.style.display = "none";
+                if (DEBUG) debug('Countdown hidden: expectedEnd missing or <= today; firstPointDate=' + (data.firstPointDate||'null') + ' periodEnd=' + (data.periodEndDate||'null'), 'info');
+            }
         } else if (countdownCard) {
             countdownCard.style.display = "none";
         }
