@@ -458,6 +458,7 @@ function updateLanguage(lang) {
     safeSetText('nav-booking', t.navBooking); safeSetText('nav-profile', t.navProfile);
     safeSetText('nav-history', t.navHistory); safeSetText('history-title', t.historyTitle);
     safeSetText('txt-next-apt', t.next);
+    safeSetText('forgot-password', t.forgotPassword);
     if (t.settingsTitle) safeSetText('txt-settings-title', t.settingsTitle);
     if (t.displayNameLabel) safeSetText('txt-display-name-label', t.displayNameLabel);
     if (t.emailLabel) safeSetText('txt-email-label', t.emailLabel);
@@ -507,6 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleLink = document.getElementById('toggle-signup');
     const btnLogin = document.getElementById('btn-login');
     const btnSignup = document.getElementById('btn-signup');
+    const forgotPasswordLink = document.getElementById('forgot-password');
     let isSigningUp = false;
 
     if(toggleLink) toggleLink.onclick = () => {
@@ -516,12 +518,46 @@ document.addEventListener('DOMContentLoaded', () => {
             usernameInput.style.display = 'block';
             btnLogin.style.display = 'none';
             btnSignup.style.display = 'block';
+            if(forgotPasswordLink) forgotPasswordLink.style.display = 'none';
         } else {
             usernameInput.style.display = 'none';
             btnSignup.style.display = 'none';
             btnLogin.style.display = 'block';
+            if(forgotPasswordLink) forgotPasswordLink.style.display = 'block';
         }
         updateLanguage(currentLang); 
+    };
+    
+    // Password reset functionality
+    if(forgotPasswordLink) forgotPasswordLink.onclick = async () => {
+        const email = document.getElementById('email').value;
+        const currentLang = localStorage.getItem('userLang') || 'sr';
+        const emailErr = document.getElementById('email-error');
+        
+        if(!email) {
+            if(emailErr) {
+                emailErr.innerText = langData[currentLang].emailInvalid;
+                emailErr.style.display = 'block';
+            }
+            return;
+        }
+        
+        try {
+            await sendPasswordResetEmail(auth, email);
+            alert(langData[currentLang].resetPasswordSent);
+            if(emailErr) emailErr.style.display = 'none';
+        } catch(err) {
+            if(emailErr) {
+                if(err.code === 'auth/user-not-found') {
+                    emailErr.innerText = langData[currentLang].userNotFound;
+                } else if(err.code === 'auth/invalid-email') {
+                    emailErr.innerText = langData[currentLang].emailInvalid;
+                } else {
+                    emailErr.innerText = err.message;
+                }
+                emailErr.style.display = 'block';
+            }
+        }
     };
 });
 
@@ -588,9 +624,42 @@ document.getElementById('btn-google').onclick = async () => {
 };
 document.getElementById('btn-login').onclick = () => {
     if (DEBUG) debug('Clic connexion email...');
+    const currentLang = localStorage.getItem('userLang') || 'sr';
+    const emailErr = document.getElementById('email-error');
+    const passErr = document.getElementById('password-error');
+    if(emailErr) emailErr.style.display = 'none';
+    if(passErr) passErr.style.display = 'none';
+    
     signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value)
         .then(() => { if (DEBUG) debug('signInWithEmailAndPassword résolu (auth va mettre à jour)'); })
-        .catch((err) => { if (DEBUG) debug('Connexion email ERREUR: ' + (err.code || '') + ' ' + (err.message || ''), 'err'); });
+        .catch((err) => { 
+            if (DEBUG) debug('Connexion email ERREUR: ' + (err.code || '') + ' ' + (err.message || ''), 'err');
+            
+            if (err.code === "auth/wrong-password" && passErr) {
+                passErr.innerText = langData[currentLang].wrongPassword;
+                passErr.style.display = 'block';
+            } else if (err.code === "auth/user-not-found" && emailErr) {
+                emailErr.innerText = langData[currentLang].userNotFound;
+                emailErr.style.display = 'block';
+            } else if (err.code === "auth/invalid-email" && emailErr) {
+                emailErr.innerText = langData[currentLang].emailInvalid;
+                emailErr.style.display = 'block';
+            } else if (err.code === "auth/invalid-credential") {
+                // Firebase returns this for security - could be wrong email or password
+                if(emailErr) {
+                    emailErr.innerText = langData[currentLang].userNotFound;
+                    emailErr.style.display = 'block';
+                }
+            } else if (err.code === "auth/missing-password" && passErr) {
+                passErr.innerText = langData[currentLang].passTooWeak;
+                passErr.style.display = 'block';
+            } else {
+                if(passErr) {
+                    passErr.innerText = langData[currentLang].loginError;
+                    passErr.style.display = 'block';
+                }
+            }
+        });
 };
 document.getElementById('btn-signup').onclick = () => {
     const e = document.getElementById('email').value;
@@ -598,7 +667,7 @@ document.getElementById('btn-signup').onclick = () => {
     const username = document.getElementById('username').value;
     if (!username) { alert("Nom/Pseudo requis"); return; }
     createUserWithEmailAndPassword(auth, e, p).then(res => updateProfile(res.user, { displayName: username })).then(() => {
-        setDoc(doc(db, "users", auth.currentUser.uid), { email: auth.currentUser.email, displayName: username, points: 0, history: [] });
+        setDoc(doc(db, "users", auth.currentUser.uid), { email: auth.currentUser.email, displayName: username, points: 0, history: [], createdAt: new Date().toISOString() });
     }).catch(error => {
         const currentLang = localStorage.getItem('userLang') || 'sr';
         const emailErr = document.getElementById('email-error');
