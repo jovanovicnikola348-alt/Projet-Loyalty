@@ -544,9 +544,20 @@ document.addEventListener('DOMContentLoaded', () => {
         
         try {
             await sendPasswordResetEmail(auth, email);
-            alert(langData[currentLang].resetPasswordSent);
+            // Display success message
+            const successMsg = document.getElementById('reset-success-message');
+            const successText = document.getElementById('reset-success-text');
+            if(successMsg && successText) {
+                successText.innerText = '✅ ' + langData[currentLang].resetPasswordSent;
+                successMsg.style.display = 'block';
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 8000);
+            }
             if(emailErr) emailErr.style.display = 'none';
+            if(DEBUG) debug('sendPasswordResetEmail réussi pour ' + email, 'ok');
         } catch(err) {
+            if(DEBUG) debug('sendPasswordResetEmail ERREUR: ' + err.code + ' - ' + err.message, 'err');
             if(emailErr) {
                 if(err.code === 'auth/user-not-found') {
                     emailErr.innerText = langData[currentLang].userNotFound;
