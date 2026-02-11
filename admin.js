@@ -306,8 +306,10 @@ document.addEventListener('DOMContentLoaded', () => {
         renderUserList(filteredUsers);
     });
 
-    // Logique Scanner (Corrigée pour mobile)
+    // Logique Scanner ULTRA-PUISSANT (Configuration Maximale)
     const html5QrCode = new Html5Qrcode("reader");
+    let torchEnabled = false;
+    
     document.getElementById('close-scanner').onclick = stopScanner;
     
     document.getElementById('open-scanner').onclick = () => {
@@ -324,10 +326,10 @@ document.addEventListener('DOMContentLoaded', () => {
             html5QrCode.start(
                 { facingMode: "environment" }, 
                 { 
-                    fps: 30,
+                    fps: 120, // FPS MAXIMUM pour détection ultra-rapide
                     qrbox: function(viewfinderWidth, viewfinderHeight) {
-                        // Dynamique: utilise 70% de la plus petite dimension
-                        let minEdgePercentage = 0.7;
+                        // ZONE DE SCAN MAXIMALE : 90% de l'écran pour capturer facilement
+                        let minEdgePercentage = 0.9;
                         let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
                         let qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
                         return {
@@ -336,30 +338,90 @@ document.addEventListener('DOMContentLoaded', () => {
                         };
                     },
                     aspectRatio: 1.0,
-                    disableFlip: false,
+                    disableFlip: false, // Active le flip pour couvrir tous les angles
                     videoConstraints: {
                         facingMode: { exact: "environment" },
+                        // RÉSOLUTION MAXIMALE pour netteté optimale
+                        width: { ideal: 3840, min: 1920 },  // 4K idéal, minimum Full HD
+                        height: { ideal: 2160, min: 1080 },
+                        aspectRatio: { ideal: 1.7777777778 },
+                        frameRate: { ideal: 120, min: 60 }, // 120 FPS idéal
                         focusMode: "continuous",
+                        exposureMode: "continuous",
+                        whiteBalanceMode: "continuous",
                         advanced: [
                             { focusMode: "continuous" },
-                            { zoom: 1.0 }
+                            { focusDistance: { ideal: 0.15 } }, // Focus optimal pour lire de près
+                            { exposureMode: "continuous" },
+                            { exposureCompensation: 0 },
+                            { whiteBalanceMode: "continuous" },
+                            { brightness: { ideal: 128 } },
+                            { contrast: { ideal: 128 } },
+                            { saturation: { ideal: 128 } },
+                            { sharpness: { ideal: 128 } },
+                            { zoom: { ideal: 1.5, max: 2.0 } }, // Léger zoom pour meilleure capture
+                            { torch: torchEnabled } // Support de la torche/flash
                         ]
                     },
-                    formatsToSupport: [ 0 ] // 0 = QR_CODE only for better performance
+                    // Support de TOUS les formats de codes pour compatibilité maximale
+                    formatsToSupport: [ 
+                        0,  // QR_CODE
+                        1,  // AZTEC
+                        2,  // CODABAR
+                        3,  // CODE_39
+                        4,  // CODE_93
+                        5,  // CODE_128
+                        6,  // DATA_MATRIX
+                        7,  // MAXICODE
+                        8,  // ITF
+                        9,  // EAN_13
+                        10, // EAN_8
+                        11, // PDF_417
+                        12, // RSS_14
+                        13, // RSS_EXPANDED
+                        14, // UPC_A
+                        15, // UPC_E
+                        16  // UPC_EAN_EXTENSION
+                    ],
+                    // Paramètres expérimentaux pour améliorer la détection
+                    rememberLastUsedCamera: true,
+                    supportedScanTypes: [0, 1, 2], // Support de tous les types de scan
+                    showTorchButtonIfSupported: true, // Afficher le bouton torche si disponible
+                    useBarCodeDetectorIfSupported: true, // Utilise l'API native des navigateurs si disponible
+                    showZoomSliderIfSupported: true // Afficher le contrôle de zoom
                 }, 
                 (decodedText, decodedResult) => {
+                    // Détection réussie
                     selectedUserId = decodedText;
                     updatePoints(1);
                     alert(translations[lang].add);
                     stopScanner();
                 },
                 (errorMessage) => {
-                    // Silent error handling - normal for continuous scanning
+                    // Silent error handling - normal pour le scan continu
                 }
             ).catch(err => {
                 console.error("Scanner error:", err);
-                alert("Erreur Caméra: Assurez-vous d'être sur HTTPS et d'avoir autorisé l'accès.");
-                stopScanner();
+                // Fallback avec configuration simplifiée si erreur
+                html5QrCode.start(
+                    { facingMode: "environment" }, 
+                    { 
+                        fps: 60,
+                        qrbox: { width: 350, height: 350 },
+                        disableFlip: false,
+                        formatsToSupport: [ 0 ] // QR_CODE seulement en fallback
+                    }, 
+                    (decodedText, decodedResult) => {
+                        selectedUserId = decodedText;
+                        updatePoints(1);
+                        alert(translations[lang].add);
+                        stopScanner();
+                    }
+                ).catch(fallbackErr => {
+                    console.error("Fallback scanner error:", fallbackErr);
+                    alert("Erreur Caméra: Assurez-vous d'être sur HTTPS et d'avoir autorisé l'accès à la caméra.");
+                    stopScanner();
+                });
             });
         }, 500);
     };
