@@ -673,10 +673,18 @@ iframe {
 
 .scanner-reader {
     width: 100%;
-    max-width: 320px;
+    max-width: 500px;
+    min-height: 400px;
     border-radius: var(--radius-md);
     overflow: hidden;
     background: var(--bg-card);
+}
+
+@media (max-width: 768px) {
+    .scanner-reader {
+        max-width: 95vw;
+        min-height: 60vh;
+    }
 }
 
 .admin-btn-secondary {

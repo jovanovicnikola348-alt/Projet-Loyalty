@@ -321,12 +321,43 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('scanner-view').style.display = 'block';
 
         setTimeout(() => {
-            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (id) => {
-                selectedUserId = id;
-                updatePoints(1);
-                alert(translations[lang].add);
-                stopScanner();
-            }).catch(err => {
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                { 
+                    fps: 30,
+                    qrbox: function(viewfinderWidth, viewfinderHeight) {
+                        // Dynamique: utilise 70% de la plus petite dimension
+                        let minEdgePercentage = 0.7;
+                        let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+                        let qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
+                        return {
+                            width: qrboxSize,
+                            height: qrboxSize
+                        };
+                    },
+                    aspectRatio: 1.0,
+                    disableFlip: false,
+                    videoConstraints: {
+                        facingMode: { exact: "environment" },
+                        focusMode: "continuous",
+                        advanced: [
+                            { focusMode: "continuous" },
+                            { zoom: 1.0 }
+                        ]
+                    },
+                    formatsToSupport: [ 0 ] // 0 = QR_CODE only for better performance
+                }, 
+                (decodedText, decodedResult) => {
+                    selectedUserId = decodedText;
+                    updatePoints(1);
+                    alert(translations[lang].add);
+                    stopScanner();
+                },
+                (errorMessage) => {
+                    // Silent error handling - normal for continuous scanning
+                }
+            ).catch(err => {
+                console.error("Scanner error:", err);
                 alert("Erreur Caméra: Assurez-vous d'être sur HTTPS et d'avoir autorisé l'accès.");
                 stopScanner();
             });
