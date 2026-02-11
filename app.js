@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, setPersistence, browserSessionPersistence, browserLocalPersistence, updateProfile, signInWithCredential, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyC0TZI_OpGJ5_-zlDY08KmYx4K9aodJRsU",
@@ -296,9 +296,28 @@ function setupUserSnapshot(user) {
             if (history.length === 0) {
                 histDiv.innerHTML = `<p style="text-align:center; color: var(--secondary);">${t.noHistory}</p>`;
             } else {
-                histDiv.innerHTML = history.slice().reverse().map(date =>
-                    `<div class="history-item-client"><span>${t.visitOn}</span>${date}</div>`
-                ).join('');
+                histDiv.innerHTML = history.slice().reverse().map(date => {
+                    // Reformater la date dans la langue correcte si nécessaire
+                    let formattedDate = date;
+                    if (currentLang === 'sr' && date) {
+                        // Si la date contient des mois français, les convertir en serbe
+                        const frToSr = {
+                            'janvier': 'januar', 'février': 'februar', 'fevrier': 'februar',
+                            'mars': 'mart', 'avril': 'april', 'mai': 'maj', 'juin': 'juni',
+                            'juillet': 'jul', 'août': 'avgust', 'aout': 'avgust',
+                            'septembre': 'septembar', 'octobre': 'oktobar',
+                            'novembre': 'novembar', 'décembre': 'decembar', 'decembre': 'decembar'
+                        };
+                        for (const [fr, sr] of Object.entries(frToSr)) {
+                            if (formattedDate.toLowerCase().includes(fr)) {
+                                formattedDate = formattedDate.replace(new RegExp(fr, 'gi'), sr);
+                                formattedDate = formattedDate.replace(' à ', ' u '); // Remplacer "à" par "u" en serbe
+                                break;
+                            }
+                        }
+                    }
+                    return `<div class="history-item-client"><span>${t.visitOn}</span> ${formattedDate}</div>`;
+                }).join('');
             }
         }
     });
@@ -648,7 +667,7 @@ document.getElementById('btn-google').onclick = async () => {
         }
     }
 };
-document.getElementById('btn-login').onclick = () => {
+document.getElementById('btn-login').onclick = async () => {
     if (DEBUG) debug('Clic connexion email...');
     const currentLang = localStorage.getItem('userLang') || 'sr';
     const emailErr = document.getElementById('email-error');
@@ -656,36 +675,106 @@ document.getElementById('btn-login').onclick = () => {
     if(emailErr) emailErr.style.display = 'none';
     if(passErr) passErr.style.display = 'none';
     
-    signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value)
-        .then(() => { if (DEBUG) debug('signInWithEmailAndPassword résolu (auth va mettre à jour)'); })
-        .catch((err) => { 
-            if (DEBUG) debug('Connexion email ERREUR: ' + (err.code || '') + ' ' + (err.message || ''), 'err');
-            
-            if (err.code === "auth/wrong-password" && passErr) {
-                passErr.innerText = langData[currentLang].wrongPassword;
-                passErr.style.display = 'block';
-            } else if (err.code === "auth/user-not-found" && emailErr) {
+    const emailValue = document.getElementById('email').value.trim();
+    const passwordValue = document.getElementById('password').value;
+    
+    // Validation côté client
+    if (!emailValue) {
+        if(emailErr) {
+            emailErr.innerText = currentLang === 'sr' ? 'Email je obavezan.' : 'L\'email est requis.';
+            emailErr.style.display = 'block';
+        }
+        return;
+    }
+    
+    if (!passwordValue) {
+        if(passErr) {
+            passErr.innerText = currentLang === 'sr' ? 'Lozinka je obavezna.' : 'Le mot de passe est requis.';
+            passErr.style.display = 'block';
+        }
+        return;
+    }
+    
+    // Vérifier le format de l'email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValidEmailFormat = emailRegex.test(emailValue);
+    
+    if (!isValidEmailFormat) {
+        if(emailErr) {
+            emailErr.innerText = langData[currentLang].emailInvalid;
+            emailErr.style.display = 'block';
+        }
+        return;
+    }
+    
+    try {
+        // Vérifier d'abord si l'utilisateur existe dans Firestore
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('email', '==', emailValue));
+        const querySnapshot = await getDocs(q);
+        
+        const emailExists = !querySnapshot.empty;
+        
+        // Tenter la connexion
+        await signInWithEmailAndPassword(auth, emailValue, passwordValue);
+        if (DEBUG) debug('signInWithEmailAndPassword résolu (auth va mettre à jour)');
+        
+    } catch (err) {
+        if (DEBUG) debug('Connexion email ERREUR: ' + (err.code || '') + ' ' + (err.message || ''), 'err');
+        
+        if (err.code === "auth/wrong-password" && passErr) {
+            passErr.innerText = langData[currentLang].wrongPassword;
+            passErr.style.display = 'block';
+        } else if (err.code === "auth/user-not-found") {
+            if(emailErr) {
                 emailErr.innerText = langData[currentLang].userNotFound;
                 emailErr.style.display = 'block';
-            } else if (err.code === "auth/invalid-email" && emailErr) {
-                emailErr.innerText = langData[currentLang].emailInvalid;
-                emailErr.style.display = 'block';
-            } else if (err.code === "auth/invalid-credential") {
-                // Firebase returns this for security - could be wrong email or password
-                if(emailErr) {
-                    emailErr.innerText = langData[currentLang].userNotFound;
-                    emailErr.style.display = 'block';
+            }
+        } else if (err.code === "auth/invalid-email" && emailErr) {
+            emailErr.innerText = langData[currentLang].emailInvalid;
+            emailErr.style.display = 'block';
+        } else if (err.code === "auth/invalid-credential") {
+            // Vérifier si on a pu déterminer si l'email existe
+            try {
+                const usersRef = collection(db, 'users');
+                const q = query(usersRef, where('email', '==', emailValue));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    // L'email n'existe pas dans notre base
+                    if(emailErr) {
+                        emailErr.innerText = langData[currentLang].userNotFound;
+                        emailErr.style.display = 'block';
+                    }
+                } else {
+                    // L'email existe, donc c'est probablement le mot de passe
+                    if(passErr) {
+                        passErr.innerText = currentLang === 'sr' 
+                            ? 'Pogrešna lozinka. Proverite lozinku.' 
+                            : 'Mot de passe incorrect. Vérifiez votre mot de passe.';
+                        passErr.style.display = 'block';
+                    }
                 }
-            } else if (err.code === "auth/missing-password" && passErr) {
-                passErr.innerText = langData[currentLang].passTooWeak;
-                passErr.style.display = 'block';
-            } else {
+            } catch (firestoreErr) {
+                // Si on ne peut pas vérifier, afficher un message générique
                 if(passErr) {
                     passErr.innerText = langData[currentLang].loginError;
                     passErr.style.display = 'block';
                 }
             }
-        });
+        } else if (err.code === "auth/missing-password" && passErr) {
+            passErr.innerText = langData[currentLang].passTooWeak;
+            passErr.style.display = 'block';
+        } else if (err.code === "auth/too-many-requests" && passErr) {
+            passErr.innerText = currentLang === 'sr' ? 'Previše pokušaja. Pokušajte kasnije.' : 'Trop de tentatives. Réessayez plus tard.';
+            passErr.style.display = 'block';
+        } else {
+            if(passErr) {
+                passErr.innerText = langData[currentLang].loginError;
+                passErr.style.display = 'block';
+            }
+        }
+    }
 };
 document.getElementById('btn-signup').onclick = () => {
     const e = document.getElementById('email').value;

@@ -24,11 +24,20 @@ const translations = {
     sr: { subtitle: "Upravljanje salonom", search: "Traži klijenta...", add: "Poen dodat !", gift: "Poklon !" }
 };
 
-// Fonction pour formater la date : "31 janvier à 20h36"
+// Fonction pour formater la date : "31 januar u 20h36" (serbe) ou "31 janvier à 20h36" (français)
 function getNiceDate() {
     const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
     let d = new Date().toLocaleDateString(lang === 'sr' ? 'sr-RS' : 'fr-FR', options);
-    return d.replace(':', 'h').replace(',', ' à');
+    
+    if (lang === 'sr') {
+        // Pour le serbe, remplacer les séparateurs français par serbes
+        d = d.replace(',', '').replace(/\sat\s/, ' u ').replace(':', 'h');
+    } else {
+        // Pour le français
+        d = d.replace(':', 'h').replace(',', ' à');
+    }
+    
+    return d;
 }
 
 // --- NORMALIZATION CONFIG ---
