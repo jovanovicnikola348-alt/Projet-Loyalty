@@ -287,7 +287,7 @@ function setupUserSnapshot(user) {
         if (qrEl) {
             qrEl.innerHTML = "";
             if (typeof QRCode !== 'undefined') {
-                new QRCode(qrEl, { text: user.uid, width: 140, height: 140, colorDark: '#1A1A1A' });
+                new QRCode(qrEl, { text: user.uid, width: 120, height: 120, colorDark: '#1A1A1A' });
             }
         }
         const histDiv = document.getElementById('visit-history-client');
