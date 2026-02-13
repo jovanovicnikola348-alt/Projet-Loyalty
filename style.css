@@ -1019,45 +1019,6 @@ iframe {
 }
 
 
-/* ========== THEME SWITCHER ========== */
-.theme-switcher {
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    z-index: 10000;
-}
-
-.theme-toggle {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: rgba(212, 165, 116, 0.15);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 2px solid rgba(212, 165, 116, 0.3);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.theme-toggle:hover {
-    transform: scale(1.1) rotate(90deg);
-    background: rgba(212, 165, 116, 0.25);
-    box-shadow: 0 6px 20px rgba(212, 165, 116, 0.3);
-}
-
-.theme-toggle:active {
-    transform: scale(0.95);
-}
-
-.theme-icon {
-    font-size: 24px;
-    animation: pulse 2s ease-in-out infinite;
-}
-
 @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.8; transform: scale(1.1); }
