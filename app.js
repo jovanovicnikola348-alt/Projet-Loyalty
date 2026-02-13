@@ -76,7 +76,7 @@ async function handleGsiCredentialResponse(resp) {
         const userRef = doc(db, "users", userCred.user.uid);
         const userSnap = await getDoc(userRef);
         if (!userSnap.exists()) {
-            await setDoc(userRef, { email: userCred.user.email, displayName: userCred.user.displayName, points: 0, history: [] });
+            await setDoc(userRef, { email: userCred.user.email, displayName: userCred.user.displayName, points: 0, history: [], createdAt: new Date().toISOString() });
         } else {
             await updateDoc(userRef, { email: userCred.user.email, displayName: userCred.user.displayName });
         }
@@ -243,10 +243,10 @@ function setupUserSnapshot(user) {
             await updateDoc(doc(db, "users", user.uid), { points: 0, history: [], periodEndDate: null, firstPointDate: null });
             return;
         }
-        document.getElementById('points-display').innerText = `${data.points} / 5`;
-        if (document.getElementById('progress-bar')) document.getElementById('progress-bar').style.width = (data.points / 5 * 100) + "%";
+        document.getElementById('points-display').innerText = `${data.points} / 6`;
+        if (document.getElementById('progress-bar')) document.getElementById('progress-bar').style.width = (data.points / 6 * 100) + "%";
         const gift = document.getElementById('gift-msg');
-        gift.style.display = data.points >= 5 ? 'block' : 'none';
+        gift.style.display = data.points >= 6 ? 'block' : 'none';
         gift.innerText = t.gift;
         const countdownCard = document.getElementById('countdown-card');
         const countdownText = document.getElementById('countdown-text');
@@ -329,7 +329,7 @@ async function applyRedirectResult(result) {
     const userRef = doc(db, "users", result.user.uid);
     const userSnap = await getDoc(userRef);
     if (!userSnap.exists()) {
-        await setDoc(userRef, { email: result.user.email, displayName: result.user.displayName, points: 0, history: [] });
+        await setDoc(userRef, { email: result.user.email, displayName: result.user.displayName, points: 0, history: [], createdAt: new Date().toISOString() });
     } else {
         await updateDoc(userRef, { email: result.user.email, displayName: result.user.displayName });
     }
@@ -411,9 +411,9 @@ function tryGetRedirectResult(attempt) {
 tryGetRedirectResult(0);
 
 const langData = {
-    fr: { title: "Connexion", google: "Continuer avec Google", loyalty: "Ma Fidélité", gift: "🎁 Coupe offerte !", logout: "Déconnexion", qr: "Présentez ce code au salon :", next: "Prochain RDV", navHome: "Accueil", navBooking: "Rendez-vous", navProfile: "Profil", navHistory: "Visites", profileTitle: "Mon Profil", langLabel: "Changer la langue :", phEmail: "Email", phPassword: "Mot de passe", phUsername: "Nom/Pseudo", login: "Se connecter", signup: "Inscription", signupToggle: "Vous n'avez pas de compte ? S'inscrire", historyTitle: "Historique des visites", noHistory: "Aucune visite enregistrée.", emailInvalid: "L'adresse email n'est pas valide.", emailUsed: "Cet email est déjà utilisé.", passTooWeak: "Mot de passe trop faible (min 6)", visitOn: "Visite du", settingsTitle: "Paramètres du compte", displayNameLabel: "Nom affiché", emailLabel: "Email", saveProfile: "Enregistrer", profileUpdated: "Profil mis à jour.", nameRequired: "Le nom est requis.", resetOnDate: "Les points seront réinitialisés le %s (%s).", week: "semaine", weeks: "semaines", day: "jour", days: "jours", and: " et ", forgotPassword: "Mot de passe oublié ?", resetPasswordSent: "Email de réinitialisation envoyé !", wrongPassword: "Mot de passe incorrect.", userNotFound: "Aucun compte avec cet email.", loginError: "Erreur de connexion. Vérifiez vos identifiants.", promoTitle: "5ème coupe GRATUITE !", promoText: "Profitez de votre 5ème coupe gratuitement", promoExpiry: "⏳ Les points se réinitialisent 2 mois après la première visite" },
-    sr: { title: "Prijava", google: "Nastavi sa Google-om", loyalty: "Moja lojalnost", gift: "🎁 Besplatno šišanje !", logout: "Odjavi se", qr: "Pokažite ovaj kod u salonu :", next: "Sledeći termin", navHome: "Početna", navBooking: "Termini", navProfile: "Profil", navHistory: "Posete", profileTitle: "Moj Profil", langLabel: "Promeni jezik :", phEmail: "Email", phPassword: "Lozinka", phUsername: "Ime/Nadimak", login: "Prijavi se", signup: "Registracija", signupToggle: "Nemate nalog? Registracija", historyTitle: "Istorija poseta", noHistory: "Nema zabeleženih poseta.", emailInvalid: "Neispravna adresa e-pošte.", emailUsed: "Ovaj e-mail je već u upotrebi.", passTooWeak: "Lozinka je preslaba (min 6)", visitOn: "Poseta dana", settingsTitle: "Podešavanja naloga", displayNameLabel: "Prikazano ime", emailLabel: "Email", saveProfile: "Sačuvaj", profileUpdated: "Profil ažuriran.", nameRequired: "Ime je obavezno.", resetOnDate: "Poeni će se resetovati %s (%s).", week: "nedelja", weeks: "nedelja", day: "dan", days: "dana", and: " i ", forgotPassword: "Zaboravili ste lozinku?", resetPasswordSent: "Email za resetovanje poslat!", wrongPassword: "Pogrešna lozinka.", userNotFound: "Nema naloga sa ovim emailom.", loginError: "Greška pri prijavljivanju. Proverite podatke.", promoTitle: "5. šišanje GRATIS !", promoText: "Uživajte u besplatnom petom šišanju", promoExpiry: "⏳ Poeni se resetuju 2 meseca nakon prve posete" },
-    en: { title: "Login", google: "Continue with Google", loyalty: "My Loyalty", gift: "🎁 Free Haircut !", logout: "Logout", qr: "Show this code at the salon:", next: "Next Appointment", navHome: "Home", navBooking: "Booking", navProfile: "Profile", navHistory: "History", profileTitle: "My Profile", langLabel: "Change Language :", phEmail: "Email", phPassword: "Password", phUsername: "Name/Nickname", login: "Login", signup: "Signup", signupToggle: "Don't have an account? Sign up", historyTitle: "Visit History", noHistory: "No recorded visits.", emailInvalid: "Invalid email address.", emailUsed: "This email is already in use.", passTooWeak: "Password too weak (min 6)", visitOn: "Visit on", settingsTitle: "Account settings", displayNameLabel: "Display name", emailLabel: "Email", saveProfile: "Save", profileUpdated: "Profile updated.", nameRequired: "Name is required.", resetOnDate: "Points will reset on %s (%s).", week: "week", weeks: "weeks", day: "day", days: "days", and: " and ", forgotPassword: "Forgot password?", resetPasswordSent: "Password reset email sent!", wrongPassword: "Wrong password.", userNotFound: "No account found with this email.", loginError: "Login error. Check your credentials.", promoTitle: "5th haircut FREE!", promoText: "Enjoy your 5th haircut for free", promoExpiry: "⏳ Points reset 2 months after first visit" }
+    fr: { title: "Connexion", google: "Continuer avec Google", loyalty: "Ma Fidélité", gift: "🎁 Coupe offerte !", logout: "Déconnexion", qr: "Présentez ce code au salon :", next: "Prochain RDV", navHome: "Accueil", navBooking: "Rendez-vous", navProfile: "Profil", navHistory: "Visites", profileTitle: "Mon Profil", langLabel: "Changer la langue :", phEmail: "Email", phPassword: "Mot de passe", phUsername: "Nom/Pseudo", login: "Se connecter", signup: "Inscription", signupToggle: "Vous n'avez pas de compte ? S'inscrire", historyTitle: "Historique des visites", noHistory: "Aucune visite enregistrée.", emailInvalid: "L'adresse email n'est pas valide.", emailUsed: "Cet email est déjà utilisé.", passTooWeak: "Mot de passe trop faible (min 6)", visitOn: "Visite du", settingsTitle: "Paramètres du compte", displayNameLabel: "Nom affiché", emailLabel: "Email", saveProfile: "Enregistrer", profileUpdated: "Profil mis à jour.", nameRequired: "Le nom est requis.", resetOnDate: "Les points seront réinitialisés le %s (%s).", week: "semaine", weeks: "semaines", day: "jour", days: "jours", and: " et ", forgotPassword: "Mot de passe oublié ?", resetPasswordSent: "Email de réinitialisation envoyé !", wrongPassword: "Mot de passe incorrect.", userNotFound: "Aucun compte avec cet email.", loginError: "Erreur de connexion. Vérifiez vos identifiants.", promoTitle: "6ème coupe GRATUITE !", promoText: "Profitez de votre 6ème coupe gratuitement", promoExpiry: "⏳ Les points se réinitialisent 2 mois après la première visite" },
+    sr: { title: "Prijava", google: "Nastavi sa Google-om", loyalty: "Moja lojalnost", gift: "🎁 Besplatno šišanje !", logout: "Odjavi se", qr: "Pokažite ovaj kod u salonu :", next: "Sledeći termin", navHome: "Početna", navBooking: "Termini", navProfile: "Profil", navHistory: "Posete", profileTitle: "Moj Profil", langLabel: "Promeni jezik :", phEmail: "Email", phPassword: "Lozinka", phUsername: "Ime/Nadimak", login: "Prijavi se", signup: "Registracija", signupToggle: "Nemate nalog? Registracija", historyTitle: "Istorija poseta", noHistory: "Nema zabeleženih poseta.", emailInvalid: "Neispravna adresa e-pošte.", emailUsed: "Ovaj e-mail je već u upotrebi.", passTooWeak: "Lozinka je preslaba (min 6)", visitOn: "Poseta dana", settingsTitle: "Podešavanja naloga", displayNameLabel: "Prikazano ime", emailLabel: "Email", saveProfile: "Sačuvaj", profileUpdated: "Profil ažuriran.", nameRequired: "Ime je obavezno.", resetOnDate: "Poeni će se resetovati %s (%s).", week: "nedelja", weeks: "nedelja", day: "dan", days: "dana", and: " i ", forgotPassword: "Zaboravili ste lozinku?", resetPasswordSent: "Email za resetovanje poslat!", wrongPassword: "Pogrešna lozinka.", userNotFound: "Nema naloga sa ovim emailom.", loginError: "Greška pri prijavljivanju. Proverite podatke.", promoTitle: "6. šišanje GRATIS !", promoText: "Uživajte u besplatnom šestom šišanju", promoExpiry: "⏳ Poeni se resetuju 2 meseca nakon prve posete" },
+    en: { title: "Login", google: "Continue with Google", loyalty: "My Loyalty", gift: "🎁 Free Haircut !", logout: "Logout", qr: "Show this code at the salon:", next: "Next Appointment", navHome: "Home", navBooking: "Booking", navProfile: "Profile", navHistory: "History", profileTitle: "My Profile", langLabel: "Change Language :", phEmail: "Email", phPassword: "Password", phUsername: "Name/Nickname", login: "Login", signup: "Signup", signupToggle: "Don't have an account? Sign up", historyTitle: "Visit History", noHistory: "No recorded visits.", emailInvalid: "Invalid email address.", emailUsed: "This email is already in use.", passTooWeak: "Password too weak (min 6)", visitOn: "Visit on", settingsTitle: "Account settings", displayNameLabel: "Display name", emailLabel: "Email", saveProfile: "Save", profileUpdated: "Profile updated.", nameRequired: "Name is required.", resetOnDate: "Points will reset on %s (%s).", week: "week", weeks: "weeks", day: "day", days: "days", and: " and ", forgotPassword: "Forgot password?", resetPasswordSent: "Password reset email sent!", wrongPassword: "Wrong password.", userNotFound: "No account found with this email.", loginError: "Login error. Check your credentials.", promoTitle: "6th haircut FREE!", promoText: "Enjoy your 6th haircut for free", promoExpiry: "⏳ Points reset 2 months after first visit" }
 };
 
 // Parse localized history entries (fr/sr) into ms since epoch
@@ -656,7 +656,7 @@ document.getElementById('btn-google').onclick = async () => {
         const userRef = doc(db, "users", res.user.uid);
         const userSnap = await getDoc(userRef);
         if (!userSnap.exists()) {
-            await setDoc(userRef, { email: res.user.email, displayName: res.user.displayName, points: 0, history: [] });
+            await setDoc(userRef, { email: res.user.email, displayName: res.user.displayName, points: 0, history: [], createdAt: new Date().toISOString() });
         } else {
             await updateDoc(userRef, { email: res.user.email, displayName: res.user.displayName });
         }
@@ -818,3 +818,41 @@ document.getElementById('btn-save-profile').onclick = async () => {
         alert(err.message || 'Erreur');
     }
 };
+
+// ========== THEME SWITCHER ==========
+document.addEventListener('DOMContentLoaded', () => {
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+    
+    // Load saved theme from localStorage
+    const savedTheme = localStorage.getItem('appTheme') || 'v1';
+    if (savedTheme === 'v2') {
+        body.setAttribute('data-theme', 'v2');
+    }
+    
+    // Toggle theme on button click
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'v2' ? 'v1' : 'v2';
+            
+            // Add transition class for smooth animation
+            body.style.transition = 'all 0.5s ease';
+            
+            if (newTheme === 'v2') {
+                body.setAttribute('data-theme', 'v2');
+            } else {
+                body.removeAttribute('data-theme');
+            }
+            
+            // Save preference
+            localStorage.setItem('appTheme', newTheme);
+            
+            // Animate button
+            themeToggle.style.transform = 'scale(0.8) rotate(180deg)';
+            setTimeout(() => {
+                themeToggle.style.transform = '';
+            }, 300);
+        });
+    }
+});

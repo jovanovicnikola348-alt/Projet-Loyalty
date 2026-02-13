@@ -304,6 +304,17 @@ button {
     }
 }
 
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* ========== CARDS (HOME) ========== */
 /* Promo Card */
 .promo-card {
@@ -314,9 +325,13 @@ button {
     margin-bottom: 24px;
     text-align: center;
     box-shadow: 0 4px 20px rgba(201, 162, 39, 0.2);
-    animation: slideIn 0.5s ease-out;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .promo-card::before {
@@ -328,6 +343,7 @@ button {
     height: 200%;
     background: radial-gradient(circle, rgba(212, 165, 116, 0.1) 0%, transparent 60%);
     animation: glow 3s ease-in-out infinite;
+    z-index: 0;
 }
 
 @keyframes glow {
@@ -339,6 +355,8 @@ button {
     font-size: 48px;
     margin-bottom: 8px;
     animation: bounce 2s ease-in-out infinite;
+    position: relative;
+    z-index: 2;
 }
 
 @keyframes bounce {
@@ -353,7 +371,7 @@ button {
     color: var(--primary-light);
     margin: 0 0 8px;
     position: relative;
-    z-index: 1;
+    z-index: 2;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -362,7 +380,7 @@ button {
     color: var(--text);
     margin: 0 0 12px;
     position: relative;
-    z-index: 1;
+    z-index: 2;
     font-weight: 500;
 }
 
@@ -371,7 +389,7 @@ button {
     color: var(--text-muted);
     margin: 0;
     position: relative;
-    z-index: 1;
+    z-index: 2;
     font-style: italic;
 }
 
@@ -984,5 +1002,393 @@ iframe {
     margin-bottom: 6px;
     font-size: 14px;
     border: 1px solid var(--accent);
+}
+
+
+/* ========== THEME SWITCHER ========== */
+.theme-switcher {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 10000;
+}
+
+.theme-toggle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(212, 165, 116, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(212, 165, 116, 0.3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1) rotate(90deg);
+    background: rgba(212, 165, 116, 0.25);
+    box-shadow: 0 6px 20px rgba(212, 165, 116, 0.3);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+.theme-icon {
+    font-size: 24px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+
+/* ========== THEME V2 - MODERN GLASSMORPHISM ========== */
+body[data-theme="v2"] {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+body[data-theme="v2"] #app {
+    background: transparent;
+    box-shadow: none;
+}
+
+/* Header V2 */
+body[data-theme="v2"] header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="v2"] header h1 {
+    background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    font-size: 32px;
+    animation: titleShine 3s ease-in-out infinite;
+}
+
+@keyframes titleShine {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.3); }
+}
+
+/* Login Section V2 */
+body[data-theme="v2"] #login-section {
+    background: transparent;
+}
+
+body[data-theme="v2"] .login-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme="v2"] .login-card h2 {
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body[data-theme="v2"] input[type="email"],
+body[data-theme="v2"] input[type="password"],
+body[data-theme="v2"] input[type="text"] {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    backdrop-filter: blur(10px);
+}
+
+body[data-theme="v2"] input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+body[data-theme="v2"] .primary-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+body[data-theme="v2"] .primary-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+body[data-theme="v2"] .primary-btn:hover::before {
+    left: 100%;
+}
+
+body[data-theme="v2"] .primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+body[data-theme="v2"] .secondary-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+body[data-theme="v2"] .google-btn {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+body[data-theme="v2"] .small-link {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+body[data-theme="v2"] .separator {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Client Section V2 */
+body[data-theme="v2"] #client-section {
+    background: transparent;
+}
+
+body[data-theme="v2"] .promo-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+    animation: floatCard 3s ease-in-out infinite;
+}
+
+@keyframes floatCard {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+body[data-theme="v2"] .promo-card::before {
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+}
+
+body[data-theme="v2"] .promo-title {
+    color: #fff;
+    text-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+}
+
+body[data-theme="v2"] .promo-text,
+body[data-theme="v2"] .promo-expiry {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+body[data-theme="v2"] .status-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+body[data-theme="v2"] .status-card h3 {
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme="v2"] #points-display {
+    color: #fff;
+    text-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
+    animation: pointsPulse 2s ease-in-out infinite;
+}
+
+@keyframes pointsPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+body[data-theme="v2"] .progress-container {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+body[data-theme="v2"] #progress-bar {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.5);
+}
+
+body[data-theme="v2"] #gift-msg {
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    animation: giftBounce 1s ease-in-out infinite;
+}
+
+@keyframes giftBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+body[data-theme="v2"] .countdown-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+body[data-theme="v2"] .countdown-text {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+body[data-theme="v2"] #appointment-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+body[data-theme="v2"] .label-gold {
+    color: #fff;
+}
+
+body[data-theme="v2"] .qr-section p {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+body[data-theme="v2"] .qr-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Bottom Nav V2 */
+body[data-theme="v2"] .bottom-nav {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body[data-theme="v2"] .nav-item {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+body[data-theme="v2"] .nav-item.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+body[data-theme="v2"] .nav-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+/* History & Profile V2 */
+body[data-theme="v2"] h2 {
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body[data-theme="v2"] .history-item-client {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.95);
+}
+
+body[data-theme="v2"] .profile-settings,
+body[data-theme="v2"] .lang-settings {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+body[data-theme="v2"] .profile-label {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+body[data-theme="v2"] .profile-input,
+body[data-theme="v2"] .lang-dropdown {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+body[data-theme="v2"] .profile-email-readonly {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+body[data-theme="v2"] .btn-logout {
+    background: rgba(244, 67, 54, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+body[data-theme="v2"] .btn-logout:hover {
+    background: rgba(244, 67, 54, 0.9);
+}
+
+/* Lang Dropdown V2 */
+body[data-theme="v2"] .lang-dropdown {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+/* Error messages V2 */
+body[data-theme="v2"] .error-message {
+    color: #ffcdd2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body[data-theme="v2"] .success-message {
+    background: rgba(76, 175, 80, 0.2);
+    border: 1px solid rgba(76, 175, 80, 0.4);
+    color: #c8e6c9;
+    backdrop-filter: blur(10px);
+}
+
+/* Iframe V2 */
+body[data-theme="v2"] iframe {
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Theme Toggle in V2 */
+body[data-theme="v2"] .theme-toggle {
+    background: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+body[data-theme="v2"] .theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+}
+
+/* Add smooth transitions for theme changes */
+body, #app, header, .login-card, .promo-card, .status-card, .bottom-nav {
+    transition: background 0.5s ease, border 0.5s ease, box-shadow 0.5s ease;
+}
+
+h1, h2, h3, p, span, input, button {
+    transition: color 0.5s ease, text-shadow 0.5s ease;
 }
 

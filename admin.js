@@ -159,13 +159,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const userList = document.getElementById('user-list');
         userList.innerHTML = "";
         
-        users.forEach((user) => {
+        // Trier les utilisateurs par ordre alphabétique d'email
+        const sortedUsers = [...users].sort((a, b) => {
+            const emailA = (a.email || '').toLowerCase();
+            const emailB = (b.email || '').toLowerCase();
+            return emailA.localeCompare(emailB);
+        });
+        
+        sortedUsers.forEach((user) => {
             const div = document.createElement('div');
             div.className = 'user-card';
+            
+            // Formater la date de création
+            let createdDate = '—';
+            if (user.createdAt) {
+                try {
+                    const d = new Date(user.createdAt);
+                    createdDate = d.toLocaleDateString(lang === 'sr' ? 'sr-RS' : 'fr-FR', { 
+                        day: 'numeric', 
+                        month: 'short', 
+                        year: 'numeric' 
+                    });
+                } catch(e) {
+                    createdDate = user.createdAt.substring(0, 10);
+                }
+            }
+            
             div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>${user.email}</span>
-                    <span class="badge">${user.points}/5</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 8px;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <div style="font-weight: 600; margin-bottom: 4px;">${user.email}</div>
+                        <div style="font-size: 0.85em; color: var(--text-muted);">📅 Créé le: ${createdDate}</div>
+                    </div>
+                    <span class="badge">${user.points}/6</span>
                 </div>
             `;
             div.onclick = () => openUserDetails(user.id, user);
@@ -181,7 +207,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const historyDiv = document.getElementById('visit-history');
         historyDiv.innerHTML = user.history ? [...user.history].reverse().map(h => `<div class="history-item">📅 ${h}</div>`).join('') : "Aucune visite";
 
-        // Show firstPointDate & periodEndDate in modal
+        // Show createdAt, firstPointDate & periodEndDate in modal
+        document.getElementById('modal-created-at').innerText = user.createdAt ? formatIsoToNice(user.createdAt) : '—';
         document.getElementById('modal-first-point').innerText = user.firstPointDate ? formatIsoToNice(user.firstPointDate) : '—';
         document.getElementById('modal-period-end').innerText = user.periodEndDate ? formatIsoToNice(user.periodEndDate) : '—';
         
@@ -213,8 +240,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const newDoc = await getDoc(userRef);
         openUserDetails(selectedUserId, newDoc.data());
         
-        // LOGIQUE : Reset Automatique après 5 points
-        if (newDoc.data().points >= 5 && change > 0) {
+        // LOGIQUE : Reset Automatique après 6 points
+        if (newDoc.data().points >= 6 && change > 0) {
             if (confirm(translations[lang].confirmGift)) {
                  await updateDoc(userRef, { points: 0, history: [], periodEndDate: null });
                  alert(translations[lang].resetDone);
