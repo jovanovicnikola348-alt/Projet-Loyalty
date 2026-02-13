@@ -1148,7 +1148,7 @@ body[data-theme="v2"] #login-section {
 }
 
 body[data-theme="v2"] .login-card {
-    background: rgba(10, 14, 39, 0.8);
+    background: rgba(10, 14, 39, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 2px solid rgba(0, 255, 255, 0.3);
@@ -1175,7 +1175,7 @@ body[data-theme="v2"] .login-card h2 {
 body[data-theme="v2"] input[type="email"],
 body[data-theme="v2"] input[type="password"],
 body[data-theme="v2"] input[type="text"] {
-    background: rgba(0, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.6);
     border: 1px solid rgba(0, 255, 255, 0.3);
     color: #fff;
     backdrop-filter: blur(10px);
@@ -1187,7 +1187,7 @@ body[data-theme="v2"] input[type="password"]:focus,
 body[data-theme="v2"] input[type="text"]:focus {
     border-color: #00ffff;
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(0, 255, 255, 0.1);
-    background: rgba(0, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.7);
 }
 
 body[data-theme="v2"] input::placeholder {
@@ -1230,14 +1230,14 @@ body[data-theme="v2"] .primary-btn:active {
 }
 
 body[data-theme="v2"] .secondary-btn {
-    background: rgba(0, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(0, 255, 255, 0.4);
     color: #00ffff;
     transition: all 0.3s ease;
 }
 
 body[data-theme="v2"] .secondary-btn:hover {
-    background: rgba(0, 255, 255, 0.2);
+    background: rgba(0, 255, 255, 0.15);
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
     transform: translateY(-2px);
 }
@@ -1273,7 +1273,7 @@ body[data-theme="v2"] #client-section {
 }
 
 body[data-theme="v2"] .promo-card {
-    background: rgba(10, 14, 39, 0.7);
+    background: rgba(10, 14, 39, 0.92);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 2px solid rgba(0, 255, 255, 0.4);
@@ -1330,7 +1330,7 @@ body[data-theme="v2"] .promo-expiry {
 }
 
 body[data-theme="v2"] .status-card {
-    background: rgba(10, 14, 39, 0.7);
+    background: rgba(10, 14, 39, 0.92);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 2px solid rgba(0, 255, 157, 0.3);
@@ -1403,7 +1403,7 @@ body[data-theme="v2"] #gift-msg {
 }
 
 body[data-theme="v2"] .countdown-card {
-    background: rgba(10, 14, 39, 0.6);
+    background: rgba(10, 14, 39, 0.88);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(138, 43, 226, 0.4);
@@ -1422,7 +1422,7 @@ body[data-theme="v2"] .countdown-text {
 }
 
 body[data-theme="v2"] #appointment-card {
-    background: rgba(10, 14, 39, 0.6);
+    background: rgba(10, 14, 39, 0.88);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(0, 255, 157, 0.3);
@@ -1454,7 +1454,7 @@ body[data-theme="v2"] .qr-container {
 
 /* Bottom Nav V2 */
 body[data-theme="v2"] .bottom-nav {
-    background: rgba(10, 14, 39, 0.9);
+    background: rgba(10, 14, 39, 0.97);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-top: 2px solid rgba(0, 255, 255, 0.4);
@@ -1500,7 +1500,7 @@ body[data-theme="v2"] h2 {
 }
 
 body[data-theme="v2"] .history-item-client {
-    background: rgba(10, 14, 39, 0.7);
+    background: rgba(10, 14, 39, 0.88);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 255, 255, 0.3);
     color: rgba(0, 255, 157, 0.95);
@@ -1516,7 +1516,7 @@ body[data-theme="v2"] .history-item-client:hover {
 
 body[data-theme="v2"] .profile-settings,
 body[data-theme="v2"] .lang-settings {
-    background: rgba(10, 14, 39, 0.7);
+    background: rgba(10, 14, 39, 0.88);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(0, 255, 255, 0.3);
     box-shadow: 0 8px 32px rgba(0, 255, 255, 0.2);
@@ -1529,7 +1529,7 @@ body[data-theme="v2"] .profile-label {
 
 body[data-theme="v2"] .profile-input,
 body[data-theme="v2"] .lang-dropdown {
-    background: rgba(0, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.6);
     border: 1px solid rgba(0, 255, 255, 0.3);
     color: #fff;
     transition: all 0.3s ease;
@@ -1539,7 +1539,7 @@ body[data-theme="v2"] .profile-input:focus,
 body[data-theme="v2"] .lang-dropdown:focus {
     border-color: #00ffff;
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-    background: rgba(0, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.7);
 }
 
 body[data-theme="v2"] .profile-email-readonly {
@@ -1561,7 +1561,7 @@ body[data-theme="v2"] .btn-logout:hover {
 
 /* Lang Dropdown V2 */
 body[data-theme="v2"] .lang-dropdown {
-    background: rgba(10, 14, 39, 0.8);
+    background: rgba(10, 14, 39, 0.95);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 255, 255, 0.3);
     color: #00ffff;
