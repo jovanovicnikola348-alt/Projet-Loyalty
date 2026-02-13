@@ -305,6 +305,76 @@ button {
 }
 
 /* ========== CARDS (HOME) ========== */
+/* Promo Card */
+.promo-card {
+    background: linear-gradient(135deg, rgba(201, 162, 39, 0.25) 0%, rgba(212, 165, 116, 0.18) 100%);
+    border: 2px solid var(--primary);
+    border-radius: var(--radius-lg);
+    padding: 24px 20px;
+    margin-bottom: 24px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(201, 162, 39, 0.2);
+    animation: slideIn 0.5s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.promo-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(212, 165, 116, 0.1) 0%, transparent 60%);
+    animation: glow 3s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+.promo-icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.promo-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary-light);
+    margin: 0 0 8px;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.promo-text {
+    font-size: 15px;
+    color: var(--text);
+    margin: 0 0 12px;
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+}
+
+.promo-expiry {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    font-style: italic;
+}
+
 .status-card {
     background: var(--bg-card);
     padding: 28px 24px;
